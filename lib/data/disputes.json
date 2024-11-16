@@ -1,0 +1,18 @@
+{
+  "disputes": [
+    {
+      "id": "dispute_01",
+      "contractId": "contract_01",
+      "milestoneId": "milestone_02",
+      "initiatedBy": "contractor",
+      "status": "resolved",
+      "reason": "payment_delay",
+      "description": "Retraso en el pago del milestone completado",
+      "resolution": "payment_processed",
+      "resolutionDetails": "Pago procesado con compensación por demora",
+      "createdAt": "2024-03-10T14:00:00Z",
+      "resolvedAt": "2024-03-12T16:30:00Z",
+      "updatedAt": "2024-03-12T16:30:00Z"
+    }
+  ]
+}

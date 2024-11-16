@@ -1,0 +1,49 @@
+{
+  "contractors": [
+    {
+      "id": "cont_01",
+      "firstName": "Ana",
+      "lastName": "García",
+      "username": "anagarcia",
+      "email": "ana.garcia@gmail.com",
+      "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN9V3UF9T3HJGQZsuHhJi",
+      "skills": ["React", "Node.js", "TypeScript"],
+      "hourlyRate": 45,
+      "availability": "full-time",
+      "timezone": "America/Argentina/Buenos_Aires",
+      "profileComplete": true,
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-03-20T15:30:00Z"
+    },
+    {
+      "id": "cont_02",
+      "firstName": "Carlos",
+      "lastName": "Rodríguez",
+      "username": "carlosr",
+      "email": "carlos.rodriguez@outlook.com",
+      "password": "$2a$12$9kLx1c3XmKQvF3v5zKLZjO8FuXZHvwX5tGXqJ5z5y5j5z5y5j5z5",
+      "skills": ["Python", "Django", "AWS"],
+      "hourlyRate": 55,
+      "availability": "part-time",
+      "timezone": "America/Mexico_City",
+      "profileComplete": true,
+      "createdAt": "2024-02-01T08:00:00Z",
+      "updatedAt": "2024-03-18T12:45:00Z"
+    },
+    {
+      "id": "cont_03",
+      "firstName": "María",
+      "lastName": "López",
+      "username": "marialopez",
+      "email": "maria.lopez@yahoo.com",
+      "password": "$2a$12$8kLx1c3XmKQvF3v5zKLZjO8FuXZHvwX5tGXqJ5z5y5j5z5y5j5z5",
+      "skills": ["UI/UX", "Figma", "Adobe XD"],
+      "hourlyRate": 40,
+      "availability": "full-time",
+      "timezone": "America/Bogota",
+      "profileComplete": true,
+      "createdAt": "2024-02-15T09:30:00Z",
+      "updatedAt": "2024-03-19T14:20:00Z"
+    }
+  ]
+}

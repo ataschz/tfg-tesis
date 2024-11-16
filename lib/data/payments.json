@@ -1,0 +1,34 @@
+{
+  "payments": [
+    {
+      "id": "payment_01",
+      "contractId": "contract_01",
+      "milestoneId": "milestone_01",
+      "amount": 1500,
+      "currency": "USD",
+      "status": "completed",
+      "type": "milestone",
+      "paymentMethod": "bank_transfer",
+      "processingFee": 45,
+      "totalAmount": 1545,
+      "paidAt": "2024-02-16T10:30:00Z",
+      "createdAt": "2024-02-15T23:59:59Z"
+    },
+    {
+      "id": "payment_02",
+      "contractId": "contract_02",
+      "amount": 2200,
+      "currency": "USD",
+      "status": "completed",
+      "type": "hourly",
+      "paymentMethod": "bank_transfer",
+      "processingFee": 66,
+      "totalAmount": 2266,
+      "hoursWorked": 40,
+      "periodStart": "2024-03-01T00:00:00Z",
+      "periodEnd": "2024-03-15T23:59:59Z",
+      "paidAt": "2024-03-16T09:15:00Z",
+      "createdAt": "2024-03-15T23:59:59Z"
+    }
+  ]
+}

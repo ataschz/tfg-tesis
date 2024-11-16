@@ -1,0 +1,61 @@
+{
+  "companies": [
+    {
+      "id": "comp_01",
+      "companyName": "TechSolutions SA",
+      "website": "https://techsolutions.com",
+      "email": "rrhh@techsolutions.com",
+      "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN9V3UF9T3HJGQZsuHhJi",
+      "industry": "Software Development",
+      "size": "50-200",
+      "country": "Argentina",
+      "verificationStatus": "verified",
+      "subscription": {
+        "plan": "business",
+        "status": "active",
+        "startDate": "2024-01-01T00:00:00Z",
+        "endDate": "2024-12-31T23:59:59Z"
+      },
+      "createdAt": "2024-01-01T08:00:00Z",
+      "updatedAt": "2024-03-20T16:00:00Z"
+    },
+    {
+      "id": "comp_02",
+      "companyName": "InnovateMX",
+      "website": "https://innovatemx.com",
+      "email": "talent@innovatemx.com",
+      "password": "$2a$12$9kLx1c3XmKQvF3v5zKLZjO8FuXZHvwX5tGXqJ5z5y5j5z5y5j5z5",
+      "industry": "Technology Consulting",
+      "size": "10-50",
+      "country": "México",
+      "verificationStatus": "verified",
+      "subscription": {
+        "plan": "startup",
+        "status": "active",
+        "startDate": "2024-02-01T00:00:00Z",
+        "endDate": "2024-12-31T23:59:59Z"
+      },
+      "createdAt": "2024-02-01T10:00:00Z",
+      "updatedAt": "2024-03-19T11:30:00Z"
+    },
+    {
+      "id": "comp_03",
+      "companyName": "DigitalCO",
+      "website": "https://digitalco.co",
+      "email": "hr@digitalco.co",
+      "password": "$2a$12$8kLx1c3XmKQvF3v5zKLZjO8FuXZHvwX5tGXqJ5z5y5j5z5y5j5z5",
+      "industry": "Digital Marketing",
+      "size": "1-10",
+      "country": "Colombia",
+      "verificationStatus": "verified",
+      "subscription": {
+        "plan": "startup",
+        "status": "active",
+        "startDate": "2024-03-01T00:00:00Z",
+        "endDate": "2024-12-31T23:59:59Z"
+      },
+      "createdAt": "2024-03-01T09:00:00Z",
+      "updatedAt": "2024-03-20T10:15:00Z"
+    }
+  ]
+}
