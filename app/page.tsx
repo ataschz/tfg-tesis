@@ -30,7 +30,7 @@ export default function Home() {
                 <span className="flex items-center gap-1">
                   <Sparkles className="h-3.5 w-3.5 text-primary" />
                   <span className="text-sm font-medium">
-                    Pagos internacionales simplificados
+                    Actualmente en Beta Cerrada
                   </span>
                 </span>
               </Badge>
