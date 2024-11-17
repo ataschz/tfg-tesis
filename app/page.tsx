@@ -76,7 +76,7 @@ export default function Home() {
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold md:text-3xl">¿Listo para transformar tu nómina?</h3>
                 <p className="text-muted-foreground">
-                  Únete a miles de empresas que usan Pact Fast para gestionar su fuerza laboral global.
+                  Únete a miles de empresas que usan strap.so para gestionar su fuerza laboral global.
                   Comienza tu prueba gratuita hoy.
                 </p>
                 <ul className="grid gap-2">

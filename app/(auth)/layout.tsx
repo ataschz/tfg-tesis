@@ -10,7 +10,7 @@ export default function AuthLayout({
         <div className="absolute inset-0 bg-grid-white/10" />
         <div className="relative h-full flex items-center justify-center p-8">
           <div className="space-y-4 text-white">
-            <h1 className="text-4xl font-bold">Pact Fast</h1>
+            <h1 className="text-4xl font-bold">strap.so</h1>
             <p className="text-lg">La plataforma líder en pagos seguros para equipos globales</p>
           </div>
         </div>
