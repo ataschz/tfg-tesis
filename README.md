@@ -1,54 +1,132 @@
-# Payroll Platform
+# getcontract - Plataforma de Gestión de Contratos y Pagos
 
-Una plataforma moderna para gestionar pagos internacionales a equipos remotos.
+Una plataforma moderna y segura para gestionar contratos y pagos internacionales para equipos remotos. Simplifica la gestión de contratos, garantiza pagos seguros y automatiza el cumplimiento normativo.
 
-## Requisitos Previos
+## 🚀 Características Principales
+
+- **Contratos Inteligentes**: Generación y gestión de contratos con plantillas personalizables
+- **Pagos Seguros**: Sistema de depósito en garantía (escrow) para pagos internacionales
+- **Multi-moneda**: Soporte para múltiples monedas incluyendo cripto
+- **Gestión de Disputas**: Sistema integrado de resolución de disputas
+- **Cumplimiento Global**: Automatización de cumplimiento normativo internacional
+- **Panel Unificado**: Vista unificada para empresas y contratistas
+
+## 🛠️ Tecnologías
+
+- **Frontend**: Next.js 13 (App Router)
+- **Estilos**: Tailwind CSS + shadcn/ui
+- **Formularios**: React Hook Form + Zod
+- **Estado**: React Context + Server Actions
+- **UI/UX**: Lucide Icons + Custom Components
+- **Fecha/Hora**: date-fns
+- **Tipos**: TypeScript
+
+## 📁 Estructura del Proyecto
+
+```
+getcontract/
+├── app/                    # App Router de Next.js
+│   ├── (admin)/           # Rutas del panel admin
+│   ├── (auth)/            # Rutas de autenticación
+│   ├── dashboard/         # Panel principal
+│   └── layout.tsx         # Layout principal
+├── components/            # Componentes React
+│   ├── admin/            # Componentes admin
+│   ├── auth/             # Componentes auth
+│   ├── company/          # Componentes empresa
+│   ├── contractor/       # Componentes contratista
+│   ├── ui/              # Componentes UI base
+│   └── unified/         # Componentes compartidos
+├── lib/                  # Utilidades y lógica
+│   ├── actions/         # Server Actions
+│   ├── data/           # Datos mock
+│   └── types/          # TypeScript types
+└── public/              # Archivos estáticos
+```
+
+## 🚦 Requisitos Previos
 
 - Node.js 18.0.0 o superior
-- PNPM 8.0.0 o superior
+- npm o pnpm
 
-## ¿Por qué PNPM?
+## 🛠️ Instalación
 
-PNPM es un gestor de paquetes más rápido y eficiente que NPM. Utiliza un almacenamiento compartido para todos los paquetes, lo que ahorra espacio en disco y acelera las instalaciones. [Más información sobre PNPM](https://pnpm.io/).
+1. Clona el repositorio:
+```bash
+git clone https://github.com/tu-usuario/getcontract.git
+cd getcontract
+```
 
-## Instalación
+2. Instala las dependencias:
+```bash
+npm install
+# o
+pnpm install
+```
 
-1. Instala PNPM si aún no lo tienes:
+3. Copia el archivo de variables de entorno:
+```bash
+cp .env.example .env
+```
 
-   ```bash
-   npm install -g pnpm
-   ```
+4. Inicia el servidor de desarrollo:
+```bash
+npm run dev
+# o
+pnpm dev
+```
 
-2. Clona el repositorio:
+La aplicación estará disponible en `http://localhost:3000`
 
-   ```bash
-   git clone https://github.com/tu-usuario/payroll-platform.git
-   cd payroll-platform
-   ```
+## 📦 Scripts Disponibles
 
-3. Instala las dependencias:
+- `npm run dev` - Inicia el servidor de desarrollo
+- `npm run build` - Construye la aplicación para producción
+- `npm start` - Inicia la aplicación en modo producción
+- `npm run lint` - Ejecuta el linter
+- `npm run test` - Ejecuta las pruebas
 
-   ```bash
-   pnpm install
-   ```
+## 🔐 Autenticación
 
-4. Copia el archivo de variables de entorno:
+El sistema incluye dos tipos de usuarios:
 
-   ```bash
-   cp .env.example .env
-   ```
+- **Empresas**: Pueden crear contratos y gestionar pagos
+- **Contratistas**: Pueden aceptar contratos y recibir pagos
 
-5. Configura las variables de entorno en el archivo `.env`
+Para probar la aplicación, usa las siguientes credenciales:
 
-6. Inicia el servidor de desarrollo:
-   ```bash
-   pnpm dev
-   ```
+```
+Empresa:
+Email: company@example.com
+Password: test123
 
-## Scripts Disponibles
+Contratista:
+Email: contractor@example.com
+Password: test123
+```
 
-- `pnpm dev` - Inicia el servidor de desarrollo
-- `pnpm build` - Construye la aplicación para producción
-- `pnpm start` - Inicia la aplicación en modo producción
-- `pnpm lint` - Ejecuta el linter
-- `pnpm test` - Ejecuta las pruebas
+## 🌍 Despliegue
+
+La aplicación está optimizada para despliegue en plataformas como:
+
+- Vercel (recomendado)
+- Netlify
+- AWS Amplify
+
+## 🤝 Contribuir
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/amazing-feature`)
+3. Commit tus cambios (`git commit -m 'Add amazing feature'`)
+4. Push a la rama (`git push origin feature/amazing-feature`)
+5. Abre un Pull Request
+
+## 📝 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## 📧 Contacto
+
+Ata Herrera - [@ataherrera](https://twitter.com/ataherrera)
+
+Link del Proyecto: [https://github.com/tu-usuario/getcontract](https://github.com/tu-usuario/getcontract)
