@@ -1,7 +1,7 @@
-import { notFound } from 'next/navigation';
-import { getCompanyProfile } from '@/lib/actions/company';
-import { CompanyProfile } from '@/components/profiles/company-profile';
-import { companies } from '@/lib/data/companies.json';
+import { notFound } from "next/navigation";
+import { getCompanyProfile } from "@/lib/actions/company";
+import { CompanyProfile } from "@/components/profiles/company-profile";
+import { companies } from "@/lib/data/companies.json";
 
 interface CompanyPageProps {
   params: {

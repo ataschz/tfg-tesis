@@ -68,15 +68,6 @@ export function UnifiedDashboard() {
 
   return (
     <div className="space-y-8 pb-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Panel de Control Unificado
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Gestiona todos tus contratos, tanto como contratista como contratante, desde un solo lugar.
-        </p>
-      </div>
-
       <UnifiedStats stats={data.stats} />
 
       <Tabs defaultValue="received" className="space-y-6">

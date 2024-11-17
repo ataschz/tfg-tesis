@@ -5,7 +5,7 @@ export function Features() {
   return (
     <section id="features" className="container space-y-12">
       <div className="text-center">
-        <h2 className="text-3xl font-bold md:text-4xl">¿Por qué elegir strap.so?</h2>
+        <h2 className="text-3xl font-bold md:text-4xl">¿Por qué elegir getcontract?</h2>
         <p className="mt-4 text-lg text-muted-foreground">
           Todo lo que necesitas para gestionar tu nómina global con confianza
         </p>

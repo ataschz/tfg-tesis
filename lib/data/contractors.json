@@ -7,12 +7,12 @@
       "username": "anagarcia",
       "email": "ana.garcia@gmail.com",
       "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN9V3UF9T3HJGQZsuHhJi",
-      "skills": ["React", "Node.js", "TypeScript"],
-      "hourlyRate": 45,
+      "skills": ["React", "Node.js", "TypeScript", "AWS", "React Native"],
+      "hourlyRate": 65,
       "availability": "full-time",
       "timezone": "America/Argentina/Buenos_Aires",
       "profileComplete": true,
-      "createdAt": "2024-01-15T10:00:00Z",
+      "createdAt": "2023-06-15T10:00:00Z",
       "updatedAt": "2024-03-20T15:30:00Z"
     },
     {
@@ -22,12 +22,12 @@
       "username": "carlosr",
       "email": "carlos.rodriguez@outlook.com",
       "password": "$2a$12$9kLx1c3XmKQvF3v5zKLZjO8FuXZHvwX5tGXqJ5z5y5j5z5y5j5z5",
-      "skills": ["Python", "Django", "AWS"],
-      "hourlyRate": 55,
-      "availability": "part-time",
+      "skills": ["Python", "Django", "AWS", "DevOps", "Kubernetes"],
+      "hourlyRate": 75,
+      "availability": "full-time",
       "timezone": "America/Mexico_City",
       "profileComplete": true,
-      "createdAt": "2024-02-01T08:00:00Z",
+      "createdAt": "2023-08-01T08:00:00Z",
       "updatedAt": "2024-03-18T12:45:00Z"
     },
     {
@@ -37,13 +37,28 @@
       "username": "marialopez",
       "email": "maria.lopez@yahoo.com",
       "password": "$2a$12$8kLx1c3XmKQvF3v5zKLZjO8FuXZHvwX5tGXqJ5z5y5j5z5y5j5z5",
-      "skills": ["UI/UX", "Figma", "Adobe XD"],
-      "hourlyRate": 40,
+      "skills": ["UI/UX", "Figma", "Adobe XD", "React", "Mobile Design"],
+      "hourlyRate": 60,
       "availability": "full-time",
       "timezone": "America/Bogota",
       "profileComplete": true,
-      "createdAt": "2024-02-15T09:30:00Z",
+      "createdAt": "2023-09-15T09:30:00Z",
       "updatedAt": "2024-03-19T14:20:00Z"
+    },
+    {
+      "id": "cont_04",
+      "firstName": "Diego",
+      "lastName": "Martínez",
+      "username": "diegom",
+      "email": "diego.martinez@gmail.com",
+      "password": "$2a$12$7kLx1c3XmKQvF3v5zKLZjO8FuXZHvwX5tGXqJ5z5y5j5z5y5j5z5",
+      "skills": ["Python", "Machine Learning", "TensorFlow", "Data Science", "D3.js"],
+      "hourlyRate": 80,
+      "availability": "part-time",
+      "timezone": "America/Santiago",
+      "profileComplete": true,
+      "createdAt": "2023-11-01T11:00:00Z",
+      "updatedAt": "2024-03-20T10:15:00Z"
     }
   ]
 }

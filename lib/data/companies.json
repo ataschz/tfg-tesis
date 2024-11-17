@@ -11,12 +11,12 @@
       "country": "Argentina",
       "verificationStatus": "verified",
       "subscription": {
-        "plan": "business",
+        "plan": "enterprise",
         "status": "active",
         "startDate": "2024-01-01T00:00:00Z",
         "endDate": "2024-12-31T23:59:59Z"
       },
-      "createdAt": "2024-01-01T08:00:00Z",
+      "createdAt": "2023-01-01T08:00:00Z",
       "updatedAt": "2024-03-20T16:00:00Z"
     },
     {
@@ -30,12 +30,12 @@
       "country": "México",
       "verificationStatus": "verified",
       "subscription": {
-        "plan": "startup",
+        "plan": "business",
         "status": "active",
         "startDate": "2024-02-01T00:00:00Z",
         "endDate": "2024-12-31T23:59:59Z"
       },
-      "createdAt": "2024-02-01T10:00:00Z",
+      "createdAt": "2023-06-01T10:00:00Z",
       "updatedAt": "2024-03-19T11:30:00Z"
     },
     {
@@ -45,16 +45,16 @@
       "email": "hr@digitalco.co",
       "password": "$2a$12$8kLx1c3XmKQvF3v5zKLZjO8FuXZHvwX5tGXqJ5z5y5j5z5y5j5z5",
       "industry": "Digital Marketing",
-      "size": "1-10",
+      "size": "10-50",
       "country": "Colombia",
       "verificationStatus": "verified",
       "subscription": {
-        "plan": "startup",
+        "plan": "business",
         "status": "active",
         "startDate": "2024-03-01T00:00:00Z",
         "endDate": "2024-12-31T23:59:59Z"
       },
-      "createdAt": "2024-03-01T09:00:00Z",
+      "createdAt": "2023-09-01T09:00:00Z",
       "updatedAt": "2024-03-20T10:15:00Z"
     }
   ]

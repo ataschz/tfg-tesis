@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { NewContractForm } from '@/components/company/new-contract-form';
-import { ContractEditor } from '@/components/company/contract-editor';
+import { useState } from "react";
+import { NewContractForm } from "@/components/company/new-contract-form";
+import { ContractEditor } from "@/components/company/contract-editor";
 
 export default function NewContractPage() {
   const [step, setStep] = useState(1);
@@ -11,18 +11,23 @@ export default function NewContractPage() {
   return (
     <div className="container space-y-6 pb-16">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Create New Contract</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Nuevo Contrato</h1>
         <p className="text-lg text-muted-foreground">
-          Define contract terms and add participants. Our AI system will help generate a professional contract.
+          Define contract terms and add participants. Our AI system will help
+          generate a professional contract.
         </p>
       </div>
 
       <div className="space-y-6">
         <div className="rounded-lg border bg-card p-4">
           <div className="flex items-center gap-4">
-            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-              step === 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-            }`}>
+            <div
+              className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                step === 1
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
               1
             </div>
             <div>
@@ -37,9 +42,13 @@ export default function NewContractPage() {
         {step >= 2 && (
           <div className="rounded-lg border bg-card p-4">
             <div className="flex items-center gap-4">
-              <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                step === 2 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-              }`}>
+              <div
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                  step === 2
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
                 2
               </div>
               <div>
@@ -54,18 +63,18 @@ export default function NewContractPage() {
       </div>
 
       {step === 1 ? (
-        <NewContractForm 
-          onGenerate={(data) => {
+        <NewContractForm
+          onGenerate={(data: any) => {
             setContractData(data);
             setStep(2);
           }}
         />
       ) : (
-        <ContractEditor 
+        <ContractEditor
           initialData={contractData}
           onBack={() => setStep(1)}
           onSubmit={(finalContract) => {
-            console.log('Final contract:', finalContract);
+            console.log("Final contract:", finalContract);
             // TODO: Handle contract submission
           }}
         />

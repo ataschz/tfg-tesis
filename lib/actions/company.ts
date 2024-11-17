@@ -13,15 +13,15 @@ export async function getCompanyData() {
   // En el futuro, esto será una consulta a Supabase
   const company = companies[0]; // Simulamos la empresa actual
   const companyContracts = contracts.filter(
-    (contract) => contract.companyId === company.id
+    (contract) => contract.companyIds.includes(company.id)
   );
 
   const contractsWithParties: ContractWithParties[] = companyContracts.map((contract) => {
     const contractContractors = contractors.filter((c) =>
-      contract.contractorId === c.id
+      contract.contractorIds.includes(c.id)
     );
     const contractCompanies = companies.filter((c) =>
-      contract.companyId === c.id
+      contract.companyIds.includes(c.id)
     );
 
     return {

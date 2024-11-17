@@ -1,42 +1,48 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { ContractReview } from '@/components/contract/contract-review';
-import { ContractReviewActions } from '@/components/contract/contract-review-actions';
-import { ContractReviewSidebar } from '@/components/contract/contract-review-sidebar';
-import { Card } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { FileText } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { ContractReview } from "@/components/contract/contract-review";
+import { ContractReviewActions } from "@/components/contract/contract-review-actions";
+import { ContractReviewSidebar } from "@/components/contract/contract-review-sidebar";
+import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { FileText } from "lucide-react";
+import { toast } from "sonner";
 
 // TODO: Replace with real data fetching
 const mockContract = {
-  id: 'contract_01',
-  title: 'Desarrollo Frontend React',
-  description: 'Desarrollo de nueva plataforma de e-commerce con React, Next.js y TypeScript.',
+  id: "contract_01",
+  title: "Desarrollo Frontend React",
+  description:
+    "Desarrollo de nueva plataforma de e-commerce con React, Next.js y TypeScript.",
   amount: 5000,
-  currency: 'USD',
-  startDate: new Date('2024-02-01'),
-  endDate: new Date('2024-04-30'),
-  status: 'pending_review',
-  companies: [{
-    id: 'comp_01',
-    name: 'TechSolutions SA',
-    email: 'rrhh@techsolutions.com',
-  }],
-  contractors: [{
-    id: 'cont_01',
-    name: 'Ana García',
-    email: 'ana.garcia@gmail.com',
-  }],
+  currency: "USD",
+  startDate: new Date("2024-02-01"),
+  endDate: new Date("2024-04-30"),
+  status: "pending_review",
+  companies: [
+    {
+      id: "comp_01",
+      name: "TechSolutions SA",
+      email: "rrhh@techsolutions.com",
+    },
+  ],
+  contractors: [
+    {
+      id: "cont_01",
+      name: "Ana García",
+      email: "ana.garcia@gmail.com",
+    },
+  ],
   deliverables: [
     {
-      title: 'Diseño de Componentes',
-      description: 'Implementación de sistema de diseño y componentes reutilizables.',
+      title: "Diseño de Componentes",
+      description:
+        "Implementación de sistema de diseño y componentes reutilizables.",
     },
     {
-      title: 'Integración de APIs',
-      description: 'Conexión con backend y manejo de estado global.',
+      title: "Integración de APIs",
+      description: "Conexión con backend y manejo de estado global.",
     },
   ],
   content: `
@@ -53,10 +59,10 @@ export default function ContractReviewPage() {
     setIsSubmitting(true);
     try {
       // TODO: Implement contract acceptance
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Contrato aceptado exitosamente');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      toast.success("Contrato aceptado exitosamente");
     } catch (error) {
-      toast.error('Error al aceptar el contrato');
+      toast.error("Error al aceptar el contrato");
     } finally {
       setIsSubmitting(false);
     }
@@ -66,10 +72,10 @@ export default function ContractReviewPage() {
     setIsSubmitting(true);
     try {
       // TODO: Implement contract rejection
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success('Contrato rechazado');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      toast.success("Contrato rechazado");
     } catch (error) {
-      toast.error('Error al rechazar el contrato');
+      toast.error("Error al rechazar el contrato");
     } finally {
       setIsSubmitting(false);
     }
@@ -85,7 +91,8 @@ export default function ContractReviewPage() {
           <div>
             <h1 className="text-2xl font-bold">Revisión de Contrato</h1>
             <p className="text-muted-foreground">
-              Por favor, revisa cuidadosamente los términos y condiciones antes de aceptar.
+              Por favor, revisa cuidadosamente los términos y condiciones antes
+              de aceptar.
             </p>
           </div>
         </div>

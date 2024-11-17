@@ -5,8 +5,11 @@ import Link from "next/link";
 import { Menu, X, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { usePathname } from "next/navigation";
 
 export function Navigation() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -14,7 +17,7 @@ export function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-xl font-bold">strap.so</span>
+            <span className="text-xl font-bold">getcontract</span>
           </Link>
 
           <div className="flex items-center gap-4 md:hidden">
@@ -34,7 +37,7 @@ export function Navigation() {
           </div>
 
           <div className="hidden md:flex md:items-center md:space-x-8">
-            <Link
+            {/* <Link
               href="#features"
               className="text-foreground/60 transition hover:text-foreground"
             >
@@ -51,10 +54,20 @@ export function Navigation() {
               className="text-foreground/60 transition hover:text-foreground"
             >
               Precios
-            </Link>
-            <Link href="/signin">
-              <Button>Empezar Ahora</Button>
-            </Link>
+            </Link> */}
+            {pathname !== "/dashboard/contract/new" &&
+              pathname !== "/admin/disputes" && (
+                <Link href="/dashboard/contract/new">
+                  <Button>Crear Contrato</Button>
+                </Link>
+              )}
+            <Button variant="ghost" className="gap-3">
+              Ata Herrera
+              <Avatar className="h-8 w-8 border-2 border-background transition-transform hover:scale-105 hover:z-10">
+                <AvatarImage src={`https://avatar.vercel.sh/ah`} />
+                <AvatarFallback>AH</AvatarFallback>
+              </Avatar>
+            </Button>
             <ThemeToggle />
           </div>
         </div>

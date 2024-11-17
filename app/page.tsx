@@ -1,7 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Banknote, Scale, ArrowRight, Globe, Clock, CheckCircle2, Users, Building2, Sparkles } from "lucide-react";
+import {
+  Shield,
+  Banknote,
+  Scale,
+  ArrowRight,
+  Globe,
+  Clock,
+  CheckCircle2,
+  Users,
+  Building2,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import { Features } from "@/components/features";
 import { Stats } from "@/components/stats";
@@ -22,18 +33,23 @@ export default function Home() {
             <Badge variant="secondary" className="rounded-full px-4 py-1.5">
               <span className="flex items-center gap-1">
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
-                <span className="text-sm font-medium">Más de 1000 empresas confían en nosotros</span>
+                <span className="text-sm font-medium">
+                  Más de 1000 empresas confían en nosotros
+                </span>
               </span>
             </Badge>
             <h1 className="text-3xl font-bold sm:text-5xl md:text-6xl lg:text-7xl">
               El Futuro de la
               <span className="relative whitespace-nowrap">
-                <span className="relative bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-400 bg-clip-text text-transparent"> Nómina Global</span>
+                <span className="relative bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-400 bg-clip-text text-transparent">
+                  {" "}
+                  Nómina Global
+                </span>
               </span>
             </h1>
             <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-              Pagos seguros con garantía, cumplimiento automatizado y resolución instantánea de disputas.
-              Paga a tu equipo global con confianza.
+              Pagos seguros con garantía, cumplimiento automatizado y resolución
+              instantánea de disputas. Paga a tu equipo global con confianza.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
               <Link href="/signin">
@@ -42,17 +58,21 @@ export default function Home() {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" className="gap-2">
-                Ver Demo
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
-                </span>
-              </Button>
+              <Link href="/dashboard">
+                <Button variant="outline" size="lg" className="gap-2">
+                  Ver Demo
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
+                  </span>
+                </Button>
+              </Link>
             </div>
-            
+
             <div className="mt-8 w-full">
-              <p className="text-sm text-muted-foreground">Empresas que confían en nosotros</p>
+              <p className="text-sm text-muted-foreground">
+                Empresas que confían en nosotros
+              </p>
               <div className="mt-6 flex flex-wrap items-center justify-center gap-8 grayscale">
                 <Building2 className="h-8 w-8" />
                 <Users className="h-8 w-8" />
@@ -74,10 +94,12 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-blue-950 dark:via-background dark:to-cyan-950" />
             <div className="relative grid gap-6 p-8 md:grid-cols-2 md:p-12">
               <div className="space-y-4">
-                <h3 className="text-2xl font-bold md:text-3xl">¿Listo para transformar tu nómina?</h3>
+                <h3 className="text-2xl font-bold md:text-3xl">
+                  ¿Listo para transformar tu nómina?
+                </h3>
                 <p className="text-muted-foreground">
-                  Únete a miles de empresas que usan strap.so para gestionar su fuerza laboral global.
-                  Comienza tu prueba gratuita hoy.
+                  Únete a miles de empresas que usan getcontract para gestionar su
+                  fuerza laboral global. Comienza tu prueba gratuita hoy.
                 </p>
                 <ul className="grid gap-2">
                   {benefits.map((benefit, index) => (
@@ -91,7 +113,9 @@ export default function Home() {
               <div className="flex flex-col items-center justify-center space-y-4">
                 <div className="text-center">
                   <div className="text-4xl font-bold">14 días gratis</div>
-                  <div className="text-muted-foreground">Sin tarjeta de crédito</div>
+                  <div className="text-muted-foreground">
+                    Sin tarjeta de crédito
+                  </div>
                 </div>
                 <Link href="/signin">
                   <Button size="lg" className="w-full md:w-auto">

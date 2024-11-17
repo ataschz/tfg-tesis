@@ -8,20 +8,20 @@ import type { Contractor } from '@/lib/types/database';
 
 export async function getContractorData() {
   // Simular delay de red
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
   // En el futuro, esto será una consulta a Supabase
   const contractor = contractors[0]; // Simulamos el contratista actual
   const contractorContracts = contracts.filter(
-    (contract) => contract.contractorId === contractor.id
+    (contract) => contract.contractorIds.includes(contractor.id)
   );
 
   const contractsWithParties: ContractWithParties[] = contractorContracts.map((contract) => {
     const contractContractors = contractors.filter((c) =>
-      contract.contractorId === c.id
+      contract.contractorIds.includes(c.id)
     );
     const contractCompanies = companies.filter((c) =>
-      contract.companyId === c.id
+      contract.companyIds.includes(c.id)
     );
 
     return {
@@ -33,10 +33,8 @@ export async function getContractorData() {
 
   // Calcular el saldo pendiente sumando los montos de los hitos pendientes
   const pendingAmount = contractorContracts.reduce((total, contract) => {
-    if (contract.milestones) {
-      return total + contract.milestones
-        .filter(m => m.status !== 'completed')
-        .reduce((sum, m) => sum + m.amount, 0);
+    if (contract.status === 'active') {
+      return total + contract.amount;
     }
     return total;
   }, 0);
@@ -54,7 +52,7 @@ export async function getContractorData() {
 
 export async function getContractorProfile(id: string): Promise<Contractor | null> {
   // Simular delay de red
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 1000));
   
   // En el futuro, esto será una consulta a Supabase
   const contractor = contractors.find(c => c.id === id);
@@ -63,7 +61,7 @@ export async function getContractorProfile(id: string): Promise<Contractor | nul
 
 export async function getContractPDF(contractId: string): Promise<Blob> {
   // Simular delay de red
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 1000));
   
   // En un caso real, esto generaría el PDF desde el servidor
   return new Blob(['Contenido del contrato'], { type: 'application/pdf' });

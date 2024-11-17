@@ -8,7 +8,7 @@ export function Testimonials() {
       <div className="text-center">
         <h2 className="text-3xl font-bold md:text-4xl">Amado por las Empresas</h2>
         <p className="mt-4 text-lg text-muted-foreground">
-          Descubre lo que nuestros clientes dicen sobre strap.so
+          Descubre lo que nuestros clientes dicen sobre getcontract
         </p>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -44,7 +44,7 @@ export function Testimonials() {
 
 const testimonials = [
   {
-    quote: "strap.so ha transformado la forma en que gestionamos nuestro equipo global. El sistema de garantía nos da tranquilidad y la plataforma es increíblemente fácil de usar.",
+    quote: "getcontract ha transformado la forma en que gestionamos nuestro equipo global. El sistema de garantía nos da tranquilidad y la plataforma es increíblemente fácil de usar.",
     author: "Sara Martínez",
     role: "CEO de TechFlow",
   },
@@ -54,7 +54,7 @@ const testimonials = [
     role: "COO de GlobalScale",
   },
   {
-    quote: "Soporte excepcional y características robustas. strap.so ha simplificado nuestro cumplimiento y ha hecho que pagar a los contratistas sea libre de estrés.",
+    quote: "Soporte excepcional y características robustas. getcontract ha simplificado nuestro cumplimiento y ha hecho que pagar a los contratistas sea libre de estrés.",
     author: "Elena Torres",
     role: "Directora de RRHH en DevCorp",
   },

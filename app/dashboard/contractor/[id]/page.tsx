@@ -1,7 +1,7 @@
-import { notFound } from 'next/navigation';
-import { getContractorProfile } from '@/lib/actions/contractor';
-import { ContractorProfile } from '@/components/profiles/contractor-profile';
-import { contractors } from '@/lib/data/contractors.json';
+import { notFound } from "next/navigation";
+import { getContractorProfile } from "@/lib/actions/contractor";
+import { ContractorProfile } from "@/components/profiles/contractor-profile";
+import { contractors } from "@/lib/data/contractors.json";
 
 interface ContractorPageProps {
   params: {
