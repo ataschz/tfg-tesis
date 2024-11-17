@@ -1,13 +1,14 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { getCompanyData } from '@/lib/actions/company';
-import { ContractList } from '@/components/company/contract-list';
-import { StatsCards } from '@/components/company/stats-cards';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
-import Link from 'next/link';
-import type { ContractWithParties } from '@/lib/types/dashboard';
+import { useEffect, useState } from "react";
+import { getCompanyData } from "@/lib/actions/company";
+import { ContractList } from "@/components/company/contract-list";
+import { StatsCards } from "@/components/company/stats-cards";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import Link from "next/link";
+import type { ContractWithParties } from "@/lib/types/dashboard";
+import { DashboardSkeleton } from "./dashboard-skeleton";
 
 interface DashboardData {
   stats: {
@@ -32,7 +33,7 @@ export function CompanyDashboard() {
         const result = await getCompanyData();
         setData(result);
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error("Error loading dashboard data:", error);
       } finally {
         setLoading(false);
       }
@@ -42,7 +43,7 @@ export function CompanyDashboard() {
   }, []);
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <DashboardSkeleton />;
   }
 
   if (!data) {
@@ -57,7 +58,8 @@ export function CompanyDashboard() {
             ¡Bienvenido, {data.user.companyName}! 👋
           </h1>
           <p className="text-lg text-muted-foreground">
-            Gestiona tus contratos activos, realiza pagos y supervisa el rendimiento de tu equipo global desde un solo lugar.
+            Gestiona tus contratos activos, realiza pagos y supervisa el
+            rendimiento de tu equipo global desde un solo lugar.
           </p>
         </div>
         <div className="flex shrink-0 items-start">
@@ -69,7 +71,7 @@ export function CompanyDashboard() {
           </Link>
         </div>
       </div>
-      
+
       <div className="grid gap-6">
         <StatsCards stats={data.stats} />
       </div>

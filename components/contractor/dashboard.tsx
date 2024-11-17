@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { getContractorData } from '@/lib/actions/contractor';
-import { ContractList } from '@/components/contractor/contract-list';
-import { BalanceCard } from '@/components/contractor/balance-card';
-import type { ContractWithParties } from '@/lib/types/dashboard';
+import { useEffect, useState } from "react";
+import { getContractorData } from "@/lib/actions/contractor";
+import { ContractList } from "@/components/contractor/contract-list";
+import { BalanceCard } from "@/components/contractor/balance-card";
+import type { ContractWithParties } from "@/lib/types/dashboard";
+import { DashboardSkeleton } from "./dashboard-skeleton";
 
 interface DashboardData {
   balance: {
@@ -28,7 +29,7 @@ export function ContractorDashboard() {
         const result = await getContractorData();
         setData(result);
       } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error("Error loading dashboard data:", error);
       } finally {
         setLoading(false);
       }
@@ -38,7 +39,7 @@ export function ContractorDashboard() {
   }, []);
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <DashboardSkeleton />;
   }
 
   if (!data) {
@@ -52,11 +53,12 @@ export function ContractorDashboard() {
           ¡Hola, {data.user.firstName}! 👋
         </h1>
         <p className="text-lg text-muted-foreground">
-          Bienvenido a tu panel de control. Aquí puedes gestionar tus contratos activos, 
-          realizar seguimiento de pagos y administrar tu perfil profesional.
+          Bienvenido a tu panel de control. Aquí puedes gestionar tus contratos
+          activos, realizar seguimiento de pagos y administrar tu perfil
+          profesional.
         </p>
       </div>
-      
+
       <div className="grid gap-6 md:grid-cols-2">
         <BalanceCard balance={data.balance} />
       </div>
