@@ -4,6 +4,7 @@ import { companies } from '@/lib/data/companies.json';
 import { contracts } from '@/lib/data/contracts.json';
 import { contractors } from '@/lib/data/contractors.json';
 import type { ContractWithParties } from '@/lib/types/dashboard';
+import type { Company } from '@/lib/types/database';
 
 export async function getCompanyData() {
   // Simular delay de red
@@ -33,21 +34,14 @@ export async function getCompanyData() {
   // Calcular montos
   const escrowAmount = companyContracts.reduce((total, contract) => {
     if (contract.status === 'active') {
-      if (contract.type === 'fixed-price') {
-        return total + (contract.amount || 0);
-      } else {
-        // Para contratos por hora, estimamos un mes
-        return total + ((contract.hourlyRate || 0) * (contract.hoursPerWeek || 0) * 4);
-      }
+      return total + contract.amount;
     }
     return total;
   }, 0);
 
   const upcomingPayments = companyContracts.reduce((total, contract) => {
-    if (contract.milestones) {
-      return total + contract.milestones
-        .filter(m => m.status === 'in-progress')
-        .reduce((sum, m) => sum + m.amount, 0);
+    if (contract.status === 'active') {
+      return total + contract.amount;
     }
     return total;
   }, 0);
@@ -68,7 +62,16 @@ export async function getCompanyData() {
   };
 }
 
-export async function releaseFunds(contractId: string, milestoneId?: string) {
+export async function getCompanyProfile(id: string): Promise<Company | null> {
+  // Simular delay de red
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  
+  // En el futuro, esto será una consulta a Supabase
+  const company = companies.find(c => c.id === id);
+  return company || null;
+}
+
+export async function releaseFunds(contractId: string) {
   // Simular delay de red
   await new Promise((resolve) => setTimeout(resolve, 1000));
   
@@ -82,4 +85,12 @@ export async function initiateDispute(contractId: string, reason: string) {
   
   // En el futuro, esto será una mutación en Supabase
   return { success: true };
+}
+
+export async function getContractPDF(contractId: string): Promise<Blob> {
+  // Simular delay de red
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  
+  // En un caso real, esto generaría el PDF desde el servidor
+  return new Blob(['Contenido del contrato'], { type: 'application/pdf' });
 }

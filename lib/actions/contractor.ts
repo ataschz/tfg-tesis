@@ -4,6 +4,7 @@ import { contractors } from '@/lib/data/contractors.json';
 import { contracts } from '@/lib/data/contracts.json';
 import { companies } from '@/lib/data/companies.json';
 import type { ContractWithParties } from '@/lib/types/dashboard';
+import type { Contractor } from '@/lib/types/database';
 
 export async function getContractorData() {
   // Simular delay de red
@@ -49,6 +50,15 @@ export async function getContractorData() {
     },
     contracts: contractsWithParties,
   };
+}
+
+export async function getContractorProfile(id: string): Promise<Contractor | null> {
+  // Simular delay de red
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  
+  // En el futuro, esto será una consulta a Supabase
+  const contractor = contractors.find(c => c.id === id);
+  return contractor || null;
 }
 
 export async function getContractPDF(contractId: string): Promise<Blob> {

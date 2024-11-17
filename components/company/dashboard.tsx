@@ -1,21 +1,60 @@
-import { Suspense } from 'react';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { getCompanyData } from '@/lib/actions/company';
 import { ContractList } from '@/components/company/contract-list';
 import { StatsCards } from '@/components/company/stats-cards';
-import { DashboardSkeleton } from '@/components/company/dashboard-skeleton';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
+import type { ContractWithParties } from '@/lib/types/dashboard';
 
-export async function CompanyDashboard() {
-  const { stats, contracts, user } = await getCompanyData();
+interface DashboardData {
+  stats: {
+    escrowAmount: number;
+    upcomingPayments: number;
+    activeContracts: number;
+    currency: string;
+  };
+  contracts: ContractWithParties[];
+  user: {
+    companyName: string;
+  };
+}
+
+export function CompanyDashboard() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const result = await getCompanyData();
+        setData(result);
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (!data) {
+    return <div>Error al cargar los datos</div>;
+  }
 
   return (
     <div className="space-y-8 pb-8">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">
-            ¡Bienvenido, {user.companyName}! 👋
+            ¡Bienvenido, {data.user.companyName}! 👋
           </h1>
           <p className="text-lg text-muted-foreground">
             Gestiona tus contratos activos, realiza pagos y supervisa el rendimiento de tu equipo global desde un solo lugar.
@@ -32,12 +71,10 @@ export async function CompanyDashboard() {
       </div>
       
       <div className="grid gap-6">
-        <StatsCards stats={stats} />
+        <StatsCards stats={data.stats} />
       </div>
 
-      <Suspense fallback={<DashboardSkeleton />}>
-        <ContractList contracts={contracts} />
-      </Suspense>
+      <ContractList contracts={data.contracts} />
     </div>
   );
 }

@@ -14,9 +14,8 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Calendar, 
   MoreVertical, 
-  FileDown, 
+  FileDown,
   Eye,
-  Clock,
   DollarSign,
   Building2,
   Users2,
@@ -24,11 +23,11 @@ import {
   Unlock
 } from 'lucide-react';
 import type { ContractWithParties } from '@/lib/types/dashboard';
-import { getContractPDF } from '@/lib/actions/contractor';
-import { releaseFunds, initiateDispute } from '@/lib/actions/company';
+import { releaseFunds, initiateDispute, getContractPDF } from '@/lib/actions/company';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import Link from 'next/link';
 
 interface ContractCardProps {
   contract: ContractWithParties;
@@ -148,16 +147,18 @@ export function ContractCard({ contract }: ContractCardProps) {
               </div>
               <div className="space-y-3">
                 {contract.companies.map((company) => (
-                  <div key={company.id} className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src={`https://avatar.vercel.sh/${company.companyName}`} alt={company.companyName} />
-                      <AvatarFallback>{company.companyName[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">{company.companyName}</p>
-                      <p className="text-xs text-muted-foreground">{company.email}</p>
+                  <Link key={company.id} href={`/company/${company.id}`}>
+                    <div className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50">
+                      <Avatar>
+                        <AvatarImage src={`https://avatar.vercel.sh/${company.companyName}`} alt={company.companyName} />
+                        <AvatarFallback>{company.companyName[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">{company.companyName}</p>
+                        <p className="text-xs text-muted-foreground">{company.email}</p>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -169,19 +170,21 @@ export function ContractCard({ contract }: ContractCardProps) {
               </div>
               <div className="space-y-3">
                 {contract.contractors.map((contractor) => (
-                  <div key={contractor.id} className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage 
-                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contractor.firstName}`} 
-                        alt={`${contractor.firstName} ${contractor.lastName}`} 
-                      />
-                      <AvatarFallback>{contractor.firstName[0]}{contractor.lastName[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">{contractor.firstName} {contractor.lastName}</p>
-                      <p className="text-xs text-muted-foreground">{contractor.email}</p>
+                  <Link key={contractor.id} href={`/contractor/${contractor.id}`}>
+                    <div className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50">
+                      <Avatar>
+                        <AvatarImage 
+                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contractor.firstName}`} 
+                          alt={`${contractor.firstName} ${contractor.lastName}`} 
+                        />
+                        <AvatarFallback>{contractor.firstName[0]}{contractor.lastName[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">{contractor.firstName} {contractor.lastName}</p>
+                        <p className="text-xs text-muted-foreground">{contractor.email}</p>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -191,18 +194,9 @@ export function ContractCard({ contract }: ContractCardProps) {
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">
-                {contract.type === 'fixed-price' 
-                  ? `${contract.currency} ${contract.amount?.toLocaleString()}`
-                  : `${contract.currency} ${contract.hourlyRate}/hora`
-                }
+                {contract.currency} {contract.amount.toLocaleString()}
               </span>
             </div>
-            {contract.hoursPerWeek && (
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{contract.hoursPerWeek}h/semana</span>
-              </div>
-            )}
             <Badge variant={contract.status === 'active' ? 'default' : 'secondary'}>
               {contract.status === 'active' ? 'Activo' : 'Finalizado'}
             </Badge>
@@ -225,48 +219,23 @@ export function ContractCard({ contract }: ContractCardProps) {
               <h4 className="font-medium">Detalles del Contrato</h4>
               <dl className="mt-2 space-y-2 text-sm">
                 <div>
-                  <dt className="text-muted-foreground">Tipo</dt>
-                  <dd className="font-medium">{contract.type === 'fixed-price' ? 'Precio Fijo' : 'Por Hora'}</dd>
-                </div>
-                <div>
                   <dt className="text-muted-foreground">Monto</dt>
                   <dd className="font-medium">
-                    {contract.currency} {contract.amount || contract.hourlyRate}
-                    {contract.type === 'hourly' && '/hora'}
+                    {contract.currency} {contract.amount.toLocaleString()}
                   </dd>
                 </div>
-                {contract.hoursPerWeek && (
-                  <div>
-                    <dt className="text-muted-foreground">Horas por Semana</dt>
-                    <dd className="font-medium">{contract.hoursPerWeek}</dd>
-                  </div>
-                )}
-                {contract.milestones && (
-                  <div>
-                    <dt className="text-muted-foreground">Hitos</dt>
-                    <dd className="mt-2">
-                      <div className="space-y-2">
-                        {contract.milestones.map((milestone) => (
-                          <div key={milestone.id} className="rounded-lg border p-3">
-                            <div className="flex items-center justify-between">
-                              <span className="font-medium">{milestone.title}</span>
-                              <Badge variant={
-                                milestone.status === 'completed' ? 'default' :
-                                milestone.status === 'in-progress' ? 'secondary' : 'outline'
-                              }>
-                                {milestone.status === 'completed' ? 'Completado' :
-                                 milestone.status === 'in-progress' ? 'En Progreso' : 'Pendiente'}
-                              </Badge>
-                            </div>
-                            <div className="mt-2 text-sm text-muted-foreground">
-                              {contract.currency} {milestone.amount.toLocaleString()}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </dd>
-                  </div>
-                )}
+                <div>
+                  <dt className="text-muted-foreground">Fecha de Inicio</dt>
+                  <dd className="font-medium">
+                    {new Date(contract.startDate).toLocaleDateString()}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-muted-foreground">Fecha de Finalización</dt>
+                  <dd className="font-medium">
+                    {new Date(contract.endDate).toLocaleDateString()}
+                  </dd>
+                </div>
               </dl>
             </div>
           </div>

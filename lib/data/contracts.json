@@ -5,36 +5,12 @@
       "companyId": "comp_01",
       "contractorId": "cont_01",
       "status": "active",
-      "type": "fixed-price",
       "title": "Desarrollo Frontend React",
       "description": "Desarrollo de nueva plataforma de e-commerce con React, Next.js y TypeScript. Implementación de diseño responsive y optimización de rendimiento.",
       "amount": 5000,
       "currency": "USD",
       "startDate": "2024-02-01T00:00:00Z",
       "endDate": "2024-04-30T23:59:59Z",
-      "milestones": [
-        {
-          "id": "milestone_01",
-          "title": "Diseño y Arquitectura",
-          "amount": 1500,
-          "status": "completed",
-          "dueDate": "2024-02-15T23:59:59Z"
-        },
-        {
-          "id": "milestone_02",
-          "title": "Desarrollo de Componentes Core",
-          "amount": 2000,
-          "status": "in-progress",
-          "dueDate": "2024-03-31T23:59:59Z"
-        },
-        {
-          "id": "milestone_03",
-          "title": "Integración y Testing",
-          "amount": 1500,
-          "status": "pending",
-          "dueDate": "2024-04-30T23:59:59Z"
-        }
-      ],
       "createdAt": "2024-01-15T10:00:00Z",
       "updatedAt": "2024-03-20T15:30:00Z"
     },
@@ -43,13 +19,12 @@
       "companyId": "comp_02",
       "contractorId": "cont_01",
       "status": "active",
-      "type": "hourly",
       "title": "Backend Developer Python",
       "description": "Mantenimiento y mejoras de APIs existentes. Optimización de consultas y mejora de rendimiento.",
-      "hourlyRate": 55,
+      "amount": 4400,
       "currency": "USD",
       "startDate": "2024-03-01T00:00:00Z",
-      "hoursPerWeek": 20,
+      "endDate": "2024-05-31T23:59:59Z",
       "createdAt": "2024-02-15T08:00:00Z",
       "updatedAt": "2024-03-19T16:45:00Z"
     },
@@ -58,36 +33,12 @@
       "companyId": "comp_03",
       "contractorId": "cont_01",
       "status": "completed",
-      "type": "fixed-price",
       "title": "Diseño UI/UX App Móvil",
       "description": "Diseño completo de interfaz de usuario para aplicación móvil de finanzas personales. Incluye investigación de usuarios y pruebas de usabilidad.",
       "amount": 3500,
       "currency": "USD",
       "startDate": "2024-01-01T00:00:00Z",
       "endDate": "2024-02-28T23:59:59Z",
-      "milestones": [
-        {
-          "id": "milestone_04",
-          "title": "Investigación y Wireframes",
-          "amount": 1000,
-          "status": "completed",
-          "dueDate": "2024-01-15T23:59:59Z"
-        },
-        {
-          "id": "milestone_05",
-          "title": "Diseño de UI",
-          "amount": 1500,
-          "status": "completed",
-          "dueDate": "2024-02-15T23:59:59Z"
-        },
-        {
-          "id": "milestone_06",
-          "title": "Pruebas y Ajustes",
-          "amount": 1000,
-          "status": "completed",
-          "dueDate": "2024-02-28T23:59:59Z"
-        }
-      ],
       "createdAt": "2023-12-15T10:00:00Z",
       "updatedAt": "2024-02-28T16:30:00Z"
     },
@@ -96,13 +47,12 @@
       "companyId": "comp_01",
       "contractorId": "cont_01",
       "status": "draft",
-      "type": "hourly",
       "title": "Consultoría DevOps",
       "description": "Implementación de pipeline de CI/CD y mejoras en la infraestructura cloud.",
-      "hourlyRate": 65,
+      "amount": 3900,
       "currency": "USD",
       "startDate": "2024-04-01T00:00:00Z",
-      "hoursPerWeek": 15,
+      "endDate": "2024-05-31T23:59:59Z",
       "createdAt": "2024-03-15T14:00:00Z",
       "updatedAt": "2024-03-15T14:00:00Z"
     },
@@ -111,7 +61,6 @@
       "companyId": "comp_02",
       "contractorId": "cont_01",
       "status": "cancelled",
-      "type": "fixed-price",
       "title": "Desarrollo WordPress Theme",
       "description": "Desarrollo de tema personalizado para WordPress con WooCommerce integrado.",
       "amount": 2500,

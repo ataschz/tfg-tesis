@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Banknote, Bitcoin, DollarSign, Euro } from "lucide-react";
 
 interface CurrencySelectorProps {
   value: string;
@@ -14,11 +15,11 @@ interface CurrencySelectorProps {
 }
 
 const currencies = [
-  { value: "USD", label: "USD - Dólar Estadounidense" },
-  { value: "EUR", label: "EUR - Euro" },
-  { value: "BTC", label: "BTC - Bitcoin" },
-  { value: "USDT", label: "USDT - Tether" },
-  { value: "USDC", label: "USDC - USD Coin" },
+  { value: "USD", label: "USD - Dólar Estadounidense", icon: DollarSign },
+  { value: "EUR", label: "EUR - Euro", icon: Euro },
+  { value: "BTC", label: "BTC - Bitcoin", icon: Bitcoin },
+  { value: "USDT", label: "USDT - Tether", icon: Banknote },
+  { value: "USDC", label: "USDC - USD Coin", icon: Banknote },
 ];
 
 export function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
@@ -30,7 +31,10 @@ export function CurrencySelector({ value, onChange }: CurrencySelectorProps) {
       <SelectContent>
         {currencies.map((currency) => (
           <SelectItem key={currency.value} value={currency.value}>
-            {currency.label}
+            <div className="flex items-center gap-2">
+              <currency.icon className="h-4 w-4" />
+              <span>{currency.label}</span>
+            </div>
           </SelectItem>
         ))}
       </SelectContent>

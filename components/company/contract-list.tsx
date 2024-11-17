@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { ContractCard } from '@/components/company/contract-card';
@@ -33,7 +33,7 @@ export function ContractList({ contracts }: ContractListProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold">Contratos Activos</h2>
+        <h2 className="text-xl font-semibold">Contratos</h2>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
