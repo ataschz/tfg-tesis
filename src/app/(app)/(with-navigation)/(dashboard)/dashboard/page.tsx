@@ -1,6 +1,5 @@
 import { requireAuth } from "@/lib/auth";
-import { CompanyDashboard } from "@/components/company/dashboard";
-import { ContractorDashboard } from "@/components/contractor/dashboard";
+import { UnifiedDashboard } from "@/components/unified/dashboard";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
@@ -9,12 +8,11 @@ export default async function DashboardPage() {
   // Show appropriate dashboard content based on user role
   switch (user.role) {
     case "client":
-      return <CompanyDashboard />;
     case "contractor":
-      return <ContractorDashboard />;
+      return <UnifiedDashboard />;
     case "mediator":
-      // Mediators still use their separate admin dashboard
-      redirect("/dashboard/admin");
+      // Mediators use their separate admin dashboard
+      redirect("/disputes");
     default:
       redirect("/signin");
   }

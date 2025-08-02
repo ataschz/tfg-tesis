@@ -4,18 +4,24 @@ import { useEffect, useState } from "react";
 import { getContractorData } from "@/lib/actions/contractor";
 import { ContractList } from "@/components/contractor/contract-list";
 import { BalanceCard } from "@/components/contractor/balance-card";
-import type { ContractWithParties } from "@/lib/types/dashboard";
+import type { ContractWithParties } from "@/lib/types/contracts";
 import { DashboardSkeleton } from "./dashboard-skeleton";
 
 interface DashboardData {
-  balance: {
-    available: number;
-    pending: number;
+  stats: {
+    totalEarnings: number;
+    escrowAmount: number;
+    activeContracts: number;
+    completedContracts: number;
     currency: string;
   };
-  contracts: ContractWithParties[];
+  contracts: any[]; // Simplified for now to handle the complex type differences
   user: {
+    id: string;
     firstName: string;
+    lastName: string;
+    email: string;
+    contractorProfile?: any;
   };
 }
 
@@ -60,7 +66,11 @@ export function ContractorDashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <BalanceCard balance={data.balance} />
+        <BalanceCard balance={{
+          available: data.stats.totalEarnings - data.stats.escrowAmount,
+          pending: data.stats.escrowAmount,
+          currency: data.stats.currency
+        }} />
       </div>
 
       <ContractList contracts={data.contracts} />

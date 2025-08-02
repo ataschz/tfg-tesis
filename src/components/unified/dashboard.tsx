@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getContractorData } from "@/lib/actions/contractor";
-import { getCompanyData } from "@/lib/actions/company";
+import { getUnifiedDashboardData } from "@/lib/actions/unified";
 import { ContractList } from "@/components/unified/contract-list";
 import { UnifiedStats } from "@/components/unified/unified-stats";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,22 +27,19 @@ export function UnifiedDashboard() {
   useEffect(() => {
     async function loadData() {
       try {
-        const [contractorData, companyData] = await Promise.all([
-          getContractorData(),
-          getCompanyData(),
-        ]);
-
+        const dashboardData = await getUnifiedDashboardData();
+        
         const unifiedData: UnifiedData = {
-          receivedContracts: contractorData.contracts,
-          sentContracts: companyData.contracts,
+          receivedContracts: dashboardData.contractorData.contracts,
+          sentContracts: dashboardData.companyData.contracts,
           stats: {
             totalActiveContracts: 
-              contractorData.contracts.filter((c: any) => c.status === 'active').length +
-              companyData.contracts.filter((c: any) => c.status === 'active').length,
-            totalPendingAmount: contractorData.balance.pending + companyData.stats.upcomingPayments,
-            totalEscrowAmount: companyData.stats.escrowAmount,
-            totalEarnedThisMonth: contractorData.balance.available,
-            currency: contractorData.balance.currency,
+              dashboardData.contractorData.contracts.filter((c: any) => c.status === 'active').length +
+              dashboardData.companyData.contracts.filter((c: any) => c.status === 'active').length,
+            totalPendingAmount: dashboardData.contractorData.stats.escrowAmount + dashboardData.companyData.stats.upcomingPayments,
+            totalEscrowAmount: dashboardData.companyData.stats.escrowAmount,
+            totalEarnedThisMonth: dashboardData.contractorData.stats.totalEarnings,
+            currency: dashboardData.contractorData.stats.currency || dashboardData.companyData.stats.currency,
           },
         };
 

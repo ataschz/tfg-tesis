@@ -118,3 +118,37 @@ export async function getUserProfileByAuthId(authUserId: string) {
     },
   });
 }
+
+export async function getUserContractStats(
+  userId: string,
+  userType: "client" | "contractor"
+) {
+  const userContracts = await getUserContracts(userId, userType);
+  
+  const activeContracts = userContracts.filter(
+    (contract) => contract.status === "in_progress" || contract.status === "accepted"
+  );
+  
+  const completedContracts = userContracts.filter(
+    (contract) => contract.status === "completed"
+  );
+
+  // Calculate total earnings/spending
+  const totalAmount = userContracts.reduce((sum, contract) => {
+    return sum + Number(contract.amount);
+  }, 0);
+
+  // Calculate escrow amount (contracts in progress)
+  const escrowAmount = activeContracts.reduce((sum, contract) => {
+    return sum + Number(contract.amount);
+  }, 0);
+
+  return {
+    totalContracts: userContracts.length,
+    activeContracts: activeContracts.length,
+    completedContracts: completedContracts.length,
+    totalAmount,
+    escrowAmount,
+    contracts: userContracts,
+  };
+}

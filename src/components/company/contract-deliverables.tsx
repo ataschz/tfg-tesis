@@ -19,7 +19,12 @@ export function ContractDeliverables({ deliverables, setDeliverables }: Contract
 
   const addDeliverable = () => {
     if (newDeliverable.title && newDeliverable.description) {
-      setDeliverables([...deliverables, newDeliverable]);
+      const deliverableWithId: Deliverable = {
+        ...newDeliverable,
+        id: Math.random().toString(36).substr(2, 9),
+        completed: false,
+      };
+      setDeliverables([...deliverables, deliverableWithId]);
       setNewDeliverable({ title: '', description: '' });
     }
   };

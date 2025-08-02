@@ -166,7 +166,7 @@ export function ContractCard({ contract }: ContractCardProps) {
                 <span className="text-sm font-medium">Empresas</span>
               </div>
               <div className="space-y-3">
-                {contract.companies.map((company: UserProfileWithRelations) => (
+                {contract.companies?.map((company: UserProfileWithRelations) => (
                   <Link key={company.id} href={`/company/${company.id}`}>
                     <div className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50">
                       <Avatar>
@@ -199,7 +199,7 @@ export function ContractCard({ contract }: ContractCardProps) {
                 <span className="text-sm font-medium">Contratistas</span>
               </div>
               <div className="space-y-3">
-                {contract.contractors.map(
+                {contract.contractors?.map(
                   (contractor: UserProfileWithRelations) => (
                     <Link
                       key={contractor.id}

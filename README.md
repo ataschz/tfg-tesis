@@ -1,4 +1,4 @@
-# getcontract - Plataforma de Gestión de Contratos y Pagos
+# trato. - Plataforma de Gestión de Contratos y Pagos
 
 Una plataforma moderna y segura para gestionar contratos y pagos internacionales para equipos remotos. Simplifica la gestión de contratos, garantiza pagos seguros y automatiza el cumplimiento normativo.
 
@@ -24,7 +24,7 @@ Una plataforma moderna y segura para gestionar contratos y pagos internacionales
 ## 📁 Estructura del Proyecto
 
 ```
-getcontract/
+trato./
 ├── app/                    # App Router de Next.js
 │   ├── (admin)/           # Rutas del panel admin
 │   ├── (auth)/            # Rutas de autenticación
@@ -52,12 +52,14 @@ getcontract/
 ## 🛠️ Instalación
 
 1. Clona el repositorio:
+
 ```bash
-git clone https://github.com/tu-usuario/getcontract.git
-cd getcontract
+git clone https://github.com/tu-usuario/trato..git
+cd trato.
 ```
 
 2. Instala las dependencias:
+
 ```bash
 npm install
 # o
@@ -65,11 +67,13 @@ pnpm install
 ```
 
 3. Copia el archivo de variables de entorno:
+
 ```bash
 cp .env.example .env
 ```
 
 4. Inicia el servidor de desarrollo:
+
 ```bash
 npm run dev
 # o
@@ -129,4 +133,4 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 Ata Herrera - [@ataherrera](https://twitter.com/ataherrera)
 
-Link del Proyecto: [https://github.com/tu-usuario/getcontract](https://github.com/tu-usuario/getcontract)
+Link del Proyecto: [https://github.com/tu-usuario/trato.](https://github.com/tu-usuario/trato.)

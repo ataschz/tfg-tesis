@@ -6,9 +6,11 @@ export function Testimonials() {
   return (
     <section className="container space-y-12">
       <div className="text-center">
-        <h2 className="text-3xl font-bold md:text-4xl">Amado por las Empresas</h2>
+        <h2 className="text-3xl font-bold md:text-4xl">
+          Amado por las Empresas
+        </h2>
         <p className="mt-4 text-lg text-muted-foreground">
-          Descubre lo que nuestros clientes dicen sobre getcontract
+          Descubre lo que nuestros clientes dicen sobre trato.
         </p>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -32,7 +34,9 @@ export function Testimonials() {
               </Avatar>
               <div>
                 <div className="font-semibold">{testimonial.author}</div>
-                <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                <div className="text-sm text-muted-foreground">
+                  {testimonial.role}
+                </div>
               </div>
             </div>
           </Card>
@@ -44,17 +48,20 @@ export function Testimonials() {
 
 const testimonials = [
   {
-    quote: "getcontract ha transformado la forma en que gestionamos nuestro equipo global. El sistema de garantía nos da tranquilidad y la plataforma es increíblemente fácil de usar.",
+    quote:
+      "trato. ha transformado la forma en que gestionamos nuestro equipo global. El sistema de garantía nos da tranquilidad y la plataforma es increíblemente fácil de usar.",
     author: "Sara Martínez",
     role: "CEO de TechFlow",
   },
   {
-    quote: "La mejor solución de nómina para equipos internacionales. Hemos reducido el tiempo de procesamiento de pagos en un 75% y ahorrado miles en comisiones.",
+    quote:
+      "La mejor solución de nómina para equipos internacionales. Hemos reducido el tiempo de procesamiento de pagos en un 75% y ahorrado miles en comisiones.",
     author: "Miguel Rodríguez",
     role: "COO de GlobalScale",
   },
   {
-    quote: "Soporte excepcional y características robustas. getcontract ha simplificado nuestro cumplimiento y ha hecho que pagar a los contratistas sea libre de estrés.",
+    quote:
+      "Soporte excepcional y características robustas. trato. ha simplificado nuestro cumplimiento y ha hecho que pagar a los contratistas sea libre de estrés.",
     author: "Elena Torres",
     role: "Directora de RRHH en DevCorp",
   },

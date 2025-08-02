@@ -2,12 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import {
-  updateContractStatus,
-  releaseContractPayments,
-  createDispute,
+  getUserContractStats,
   getContractWithParties,
   getUserProfileByAuthId,
-  getUserContractStats,
 } from "@/lib/db/queries/platform";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
@@ -22,7 +19,6 @@ async function getCurrentUserProfile() {
     redirect("/sign-in");
   }
 
-  // Obtener el perfil completo del usuario desde la base de datos
   const userProfile = await getUserProfileByAuthId(session.user.id);
 
   if (!userProfile) {
@@ -32,65 +28,23 @@ async function getCurrentUserProfile() {
   return userProfile;
 }
 
-export async function releaseFunds(contractId: string) {
+export async function getContractorData() {
   try {
     const user = await getCurrentUserProfile();
 
-    // Actualizar el estado del contrato a completado
-    await updateContractStatus(contractId, "completed");
-
-    // Liberar fondos de pagos relacionados
-    await releaseContractPayments(contractId);
-
-    revalidatePath("/dashboard");
-    return { success: true };
-  } catch (error) {
-    console.error("Error al liberar fondos:", error);
-    throw new Error("Error al liberar fondos");
-  }
-}
-
-export async function initiateDispute(contractId: string, reason: string) {
-  try {
-    const user = await getCurrentUserProfile();
-
-    // Crear nueva disputa
-    await createDispute({
-      contractId,
-      initiatorId: user.id, // Usando el ID del perfil de usuario
-      reason,
-      description: reason,
-      initiatedBy: "client", // Asumiendo que es iniciada por el cliente
-    });
-
-    // Actualizar el estado del contrato
-    await updateContractStatus(contractId, "in_dispute");
-
-    revalidatePath("/dashboard");
-    return { success: true };
-  } catch (error) {
-    console.error("Error al iniciar disputa:", error);
-    throw new Error("Error al iniciar disputa");
-  }
-}
-
-export async function getCompanyData() {
-  try {
-    const user = await getCurrentUserProfile();
-
-    if (user.userType !== "client") {
-      throw new Error("El usuario no es una empresa/cliente");
+    if (user.userType !== "contractor") {
+      throw new Error("El usuario no es un contratista");
     }
 
-    // Obtener estadísticas y contratos de la empresa
-    const contractStats = await getUserContractStats(user.id, "client");
+    // Obtener estadísticas y contratos del contratista
+    const contractStats = await getUserContractStats(user.id, "contractor");
 
     // Calcular estadísticas específicas
     const stats = {
-      totalSpent: contractStats.totalAmount,
+      totalEarnings: contractStats.totalAmount,
       escrowAmount: contractStats.escrowAmount,
       activeContracts: contractStats.activeContracts,
-      upcomingPayments: contractStats.activeContracts, // Simplificado, podrías calcular pagos pendientes
+      completedContracts: contractStats.completedContracts,
       currency: user.preferredCurrency || "USD",
     };
 
@@ -126,12 +80,12 @@ export async function getCompanyData() {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.userId, // Asumiendo que userId es el email o referencia al auth
-        clientProfile: user.clientProfile,
+        contractorProfile: user.contractorProfile,
       },
     };
   } catch (error) {
-    console.error("Error al obtener datos de la empresa:", error);
-    throw new Error("Error al obtener datos de la empresa");
+    console.error("Error al obtener datos del contratista:", error);
+    throw new Error("Error al obtener datos del contratista");
   }
 }
 

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
-import type { ContractWithParties } from '@/lib/types/dashboard';
+import type { ContractWithParties } from '@/lib/types/contracts';
 
 interface ContractListProps {
   contracts: ContractWithParties[];

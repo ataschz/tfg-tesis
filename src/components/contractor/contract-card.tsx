@@ -29,7 +29,7 @@ import {
   AlertTriangle,
   CheckCircle2,
 } from "lucide-react";
-import type { ContractWithParties } from "@/lib/types/dashboard";
+import type { ContractWithParties } from "@/lib/types/contracts";
 import { getContractPDF } from "@/lib/actions/contractor";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -142,7 +142,7 @@ export function ContractCard({ contract }: ContractCardProps) {
                 <span className="text-sm font-medium">Empresas</span>
               </div>
               <div className="space-y-3">
-                {contract.companies.map((company) => (
+                {contract.companies?.map((company: any) => (
                   <Link key={company.id} href={`/company/${company.id}`}>
                     <div className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-muted/50">
                       <Avatar>
@@ -175,7 +175,7 @@ export function ContractCard({ contract }: ContractCardProps) {
                 <span className="text-sm font-medium">Contratistas</span>
               </div>
               <div className="space-y-3">
-                {contract.contractors.map((contractor) => (
+                {contract.contractors?.map((contractor: any) => (
                   <Link
                     key={contractor.id}
                     href={`/contractor/${contractor.id}`}
