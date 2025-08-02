@@ -6,10 +6,22 @@
     "dev": "next dev --turbopack --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:check": "drizzle-kit check",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "npx tsx src/lib/db/migrate.ts",
+    "db:pull": "drizzle-kit pull",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:up": "drizzle-kit up",
+    "db:backup": "supabase db dump --file backup.sql",
+    "db:restore": "psql \"postgresql://postgres:postgres@127.0.0.1:54322/postgres\" -f backup.sql",
+    "db:sync": "pnpm run db:backup && pnpm run db:restore",
+    "db:sync-fresh": "supabase db reset && pnpm run db:restore"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
+    "@next/env": "^15.4.5",
     "@next/swc-wasm-nodejs": "13.5.1",
     "@radix-ui/react-accordion": "^1.2.1",
     "@radix-ui/react-alert-dialog": "^1.1.2",
@@ -40,6 +52,7 @@
     "@radix-ui/react-tooltip": "^1.1.4",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.53.0",
+    "@tailwindcss/typography": "^0.5.16",
     "@tiptap/extension-text-align": "^2.9.1",
     "@tiptap/pm": "^2.9.1",
     "@tiptap/react": "^2.9.1",
@@ -48,18 +61,22 @@
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
+    "better-auth": "^1.3.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
     "date-fns": "^3.6.0",
+    "drizzle-orm": "^0.44.4",
     "embla-carousel-react": "^8.3.1",
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.1",
     "input-otp": "^1.4.1",
     "lucide-react": "^0.446.0",
     "next": "^15.4.5",
-    "next-themes": "^0.3.0",
+    "next-themes": "^0.4.6",
+    "nuqs": "^2.4.3",
     "postcss": "8.4.30",
+    "postgres": "^3.4.7",
     "react": "18.2.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "18.2.0",
@@ -71,8 +88,15 @@
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.2.2",
+    "uuid": "^11.1.0",
     "vaul": "^0.9.9",
     "zod": "^3.23.8"
   },
-  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee"
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee",
+  "devDependencies": {
+    "drizzle-kit": "^0.31.4"
+  }
 }
