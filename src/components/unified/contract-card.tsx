@@ -20,9 +20,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Calendar,
   MoreVertical,
-  FileDown,
   Eye,
   DollarSign,
   Building2,
@@ -32,6 +37,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format, formatDistanceToNow, isFuture } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -42,25 +48,19 @@ interface ContractCardProps {
 }
 
 export function ContractCard({ contract, type }: ContractCardProps) {
-  const [showDetails, setShowDetails] = useState(false);
+  const router = useRouter();
   const [showDisputeDialog, setShowDisputeDialog] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const startDate = new Date(contract.startDate);
   const endDate = new Date(contract.endDate);
   const isActive = contract.status === "active" || contract.status === "in_progress";
 
-  const getStatusInfo = (status: string) => {
+  const getStatusInfo = (status: string, contractType: "received" | "sent") => {
     switch (status) {
-      case "draft":
-        return {
-          text: "Borrador",
-          badge: "bg-yellow-500/10 text-yellow-600",
-        };
       case "sent":
         return {
-          text: "Enviado",
+          text: contractType === "sent" ? "Enviado" : "Recibido",
           badge: "bg-blue-500/10 text-blue-600",
         };
       case "accepted":
@@ -101,20 +101,8 @@ export function ContractCard({ contract, type }: ContractCardProps) {
     }
   };
 
-  const status = getStatusInfo(contract.status);
+  const status = getStatusInfo(contract.status, type);
 
-  const handleDownload = async () => {
-    try {
-      setIsDownloading(true);
-      // TODO: Implement contract download
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success("Contrato descargado correctamente");
-    } catch (error) {
-      toast.error("Error al descargar el contrato");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
 
   return (
     <>
@@ -140,16 +128,9 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setShowDetails(true)}>
+                <DropdownMenuItem onClick={() => router.push(`/contracts/${contract.id}`)}>
                   <Eye className="mr-2 h-4 w-4" />
                   Ver detalle
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={handleDownload}
-                  disabled={isDownloading}
-                >
-                  <FileDown className="mr-2 h-4 w-4" />
-                  {isDownloading ? "Descargando..." : "Descargar contrato"}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setShowDisputeDialog(true)}>
                   <AlertTriangle className="mr-2 h-4 w-4" />
@@ -218,24 +199,33 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                 </div>
                 <div className="flex -space-x-2">
                   {contract.client && (
-                    <Link href={`/dashboard/client/${contract.client.id}`}>
-                      <Avatar className="h-8 w-8 border-2 border-background transition-transform hover:scale-105 hover:z-10">
-                        <AvatarImage
-                          src={`https://avatar.vercel.sh/${
-                            contract.client.company || contract.client.firstName
-                          }`}
-                          alt={
-                            contract.client.company ||
-                            `${contract.client.firstName} ${contract.client.lastName}`
-                          }
-                        />
-                        <AvatarFallback>
-                          {contract.client.company
-                            ? contract.client.company[0]
-                            : contract.client.firstName[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Link>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link href={`/profile/${contract.client.id}`}>
+                            <Avatar className="h-8 w-8 border-2 border-background transition-transform hover:scale-105 hover:z-10">
+                              <AvatarImage
+                                src={`https://avatar.vercel.sh/${
+                                  contract.client.company || contract.client.firstName
+                                }`}
+                                alt={
+                                  contract.client.company ||
+                                  `${contract.client.firstName} ${contract.client.lastName}`
+                                }
+                              />
+                              <AvatarFallback>
+                                {contract.client.company
+                                  ? contract.client.company[0]
+                                  : contract.client.firstName[0]}
+                              </AvatarFallback>
+                            </Avatar>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{contract.client.company || `${contract.client.firstName} ${contract.client.lastName}`}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                 </div>
               </div>
@@ -252,20 +242,27 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                 </div>
                 <div className="flex -space-x-2">
                   {contract.contractor && (
-                    <Link
-                      href={`/dashboard/contractor/${contract.contractor.id}`}
-                    >
-                      <Avatar className="h-8 w-8 border-2 border-background transition-transform hover:scale-105 hover:z-10">
-                        <AvatarImage
-                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contract.contractor.firstName}`}
-                          alt={`${contract.contractor.firstName} ${contract.contractor.lastName}`}
-                        />
-                        <AvatarFallback>
-                          {contract.contractor.firstName[0]}
-                          {contract.contractor.lastName[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Link>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Link href={`/profile/${contract.contractor.id}`}>
+                            <Avatar className="h-8 w-8 border-2 border-background transition-transform hover:scale-105 hover:z-10">
+                              <AvatarImage
+                                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contract.contractor.firstName}`}
+                                alt={`${contract.contractor.firstName} ${contract.contractor.lastName}`}
+                              />
+                              <AvatarFallback>
+                                {contract.contractor.firstName[0]}
+                                {contract.contractor.lastName[0]}
+                              </AvatarFallback>
+                            </Avatar>
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{contract.contractor.username ? `@${contract.contractor.username}` : `${contract.contractor.firstName} ${contract.contractor.lastName}`}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                 </div>
               </div>
@@ -274,47 +271,6 @@ export function ContractCard({ contract, type }: ContractCardProps) {
         </div>
       </Card>
 
-      {/* Details Dialog */}
-      <Dialog open={showDetails} onOpenChange={setShowDetails}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{contract.title}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-medium">Descripción</h4>
-              <p className="text-sm text-muted-foreground">
-                {contract.description}
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium">Detalles del Contrato</h4>
-              <dl className="mt-2 space-y-2 text-sm">
-                <div>
-                  <dt className="text-muted-foreground">Monto</dt>
-                  <dd className="font-medium">
-                    {contract.currency} {contract.amount.toLocaleString()}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">Fecha de Inicio</dt>
-                  <dd className="font-medium">
-                    {format(startDate, "PPP", { locale: es })}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-muted-foreground">
-                    Fecha de Finalización
-                  </dt>
-                  <dd className="font-medium">
-                    {format(endDate, "PPP", { locale: es })}
-                  </dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Dispute Dialog */}
       <Dialog open={showDisputeDialog} onOpenChange={setShowDisputeDialog}>

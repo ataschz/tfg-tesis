@@ -28,9 +28,9 @@ export async function UnifiedDashboard() {
     const sentContracts = dashboardData.companyData?.contracts || [];
     const allContracts = [...receivedContracts, ...sentContracts];
 
-    // Calculate real statistics
+    // Calculate real statistics  
     const activeContracts = allContracts.filter((c: any) => 
-      c.status === "in_progress" || c.status === "accepted"
+      c.status === "in_progress" || c.status === "accepted" || c.status === "sent"
     );
     
     const completedContracts = allContracts.filter((c: any) => 

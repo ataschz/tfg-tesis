@@ -61,7 +61,7 @@ export async function createContract(formData: {
         termsAndConditions: formData.termsAndConditions,
         clientId: primaryClientId,
         contractorId: primaryContractorId,
-        status: "draft",
+        status: "sent",
       } satisfies NewContract).returning();
 
       // Add all contractors to the many-to-many table

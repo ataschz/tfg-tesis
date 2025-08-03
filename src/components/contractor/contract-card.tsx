@@ -230,8 +230,6 @@ export function ContractCard({ contract }: ContractCardProps) {
                 ? "Aceptado"
                 : contract.status === "sent"
                 ? "Enviado"
-                : contract.status === "draft"
-                ? "Borrador"
                 : "Rechazado"}
             </Badge>
           </div>

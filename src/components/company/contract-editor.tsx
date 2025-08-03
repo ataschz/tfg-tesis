@@ -30,6 +30,19 @@ interface ContractEditorProps {
 }
 
 const generateInitialContent = (data: any) => {
+  // Use the names passed from the form, fallback to IDs if not available
+  const contractorNames = data.contractorNames || data.contractors || [];
+  const clientNames = data.clientNames || data.companies || [];
+
+  // Determine singular/plural forms
+  const contractorLabel =
+    contractorNames.length > 1 ? "LOS CONTRATISTAS" : "EL CONTRATISTA";
+  const clientLabel =
+    clientNames.length > 1 ? "LOS CONTRATANTES" : "EL CONTRATANTE";
+  const contractorTerm =
+    contractorNames.length > 1 ? "contratistas" : "contratista";
+  const clientTerm = clientNames.length > 1 ? "contratantes" : "contratante";
+
   return `
     <h1 style="text-align: center">${data.title}</h1>
     <p style="text-align: center"><strong>CONTRATO DE PRESTACIÓN DE SERVICIOS</strong></p>
@@ -45,33 +58,39 @@ const generateInitialContent = (data: any) => {
 
     <h2>Entregables</h2>
     <ul>
-      ${data.deliverables
-        .map(
-          (d: any) => `
-        <li>
-          <strong>${d.title}</strong>
-          <p>${d.description}</p>
-        </li>
-      `
-        )
-        .join("")}
+      ${
+        data.deliverables && data.deliverables.length > 0
+          ? data.deliverables
+              .map(
+                (d: any) => `
+            <li>
+              <strong>${d.title}</strong>
+              <p>${d.description}</p>
+            </li>
+          `
+              )
+              .join("")
+          : "<li>No hay entregables especificados</li>"
+      }
     </ul>
 
     <h2>Términos y Condiciones</h2>
     <p>En la ciudad de [Ciudad], a los [día] días del mes de [mes] del año [año], se celebra el presente contrato entre las siguientes partes:</p>
     
     <p><strong>PARTES CONTRATANTES:</strong></p>
-    <p>Por una parte, ${data.companies.join(
-      ", "
-    )}, en adelante denominado "EL CONTRATANTE"</p>
-    <p>Por otra parte, ${data.contractors.join(
-      ", "
-    )}, en adelante denominado "EL CONTRATISTA"</p>
+    <p>Por una parte, ${clientNames.join(", ")}, en adelante denominad${
+    clientNames.length > 1 ? "os" : "o"
+  } "${clientLabel}"</p>
+    <p>Por otra parte, ${contractorNames.join(", ")}, en adelante denominad${
+    contractorNames.length > 1 ? "os" : "o"
+  } "${contractorLabel}"</p>
 
     <p>Quienes acuerdan celebrar el presente contrato de prestación de servicios profesionales, que se regirá por las siguientes cláusulas:</p>
 
     <h3>CLÁUSULA PRIMERA: OBJETO DEL CONTRATO</h3>
-    <p>EL CONTRATISTA se compromete a prestar los servicios descritos en la sección de Entregables del presente contrato, conforme a las especificaciones detalladas y los más altos estándares de calidad profesional.</p>
+    <p>${contractorLabel} se compromete${
+    contractorNames.length > 1 ? "n" : ""
+  } a prestar los servicios descritos en la sección de Entregables del presente contrato, conforme a las especificaciones detalladas y los más altos estándares de calidad profesional.</p>
 
     <br/>
 
@@ -94,7 +113,7 @@ const generateInitialContent = (data: any) => {
     <br/>
 
     <h3>CLÁUSULA CUARTA: PROPIEDAD INTELECTUAL</h3>
-    <p>Todos los derechos de propiedad intelectual sobre los entregables, incluyendo pero no limitado a derechos de autor, patentes, diseños y secretos comerciales, serán transferidos a EL CONTRATANTE una vez efectuado el pago total de los servicios acordados.</p>
+    <p>Todos los derechos de propiedad intelectual sobre los entregables, incluyendo pero no limitado a derechos de autor, patentes, diseños y secretos comerciales, serán transferidos a ${clientLabel} una vez efectuado el pago total de los servicios acordados.</p>
 
     <br/>
 
@@ -106,15 +125,12 @@ const generateInitialContent = (data: any) => {
     <p style="text-align: center; margin-top: 60px;">En conformidad con lo establecido, firman las partes:</p>
     
     <p style="text-align: center; margin-top: 60px;">____________________                    ____________________</p>
-    <p style="text-align: center;">EL CONTRATANTE                         EL CONTRATISTA</p>
+    <p style="text-align: center;">${clientLabel}                         ${contractorLabel}</p>
     <p style="text-align: center;">[Nombre y DNI]                         [Nombre y DNI]</p>
   `;
 };
 
-export function ContractEditor({
-  initialData,
-  onBack,
-}: ContractEditorProps) {
+export function ContractEditor({ initialData, onBack }: ContractEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const editor = useEditor({
@@ -242,17 +258,25 @@ export function ContractEditor({
           <ArrowLeft className="h-4 w-4" />
           Volver a
         </Button>
-        <Button 
-          className="gap-2" 
+        <Button
+          className="gap-2"
           onClick={async () => {
             setIsSaving(true);
             try {
               const termsAndConditions = editor.getHTML();
               const result = await createContract({
-                ...initialData,
+                title: initialData.title,
+                description: initialData.description,
+                amount: initialData.amount,
+                currency: initialData.currency,
+                startDate: initialData.startDate,
+                endDate: initialData.endDate,
+                contractors: initialData.contractors,
+                companies: initialData.companies,
+                deliverables: initialData.deliverables,
                 termsAndConditions,
               });
-              
+
               if (result.success) {
                 toast.success(result.message);
                 router.push("/dashboard");

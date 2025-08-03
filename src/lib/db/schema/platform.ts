@@ -23,7 +23,6 @@ export const userTypeEnum = pgEnum("user_type", [
 ]);
 
 export const contractStatusEnum = pgEnum("contract_status", [
-  "draft",
   "sent",
   "accepted",
   "rejected",
@@ -236,7 +235,7 @@ export const contracts = pgTable(
     endDate: date("end_date"),
     deliverables: text("deliverables").array(),
     termsAndConditions: text("terms_and_conditions"),
-    status: contractStatusEnum("status").notNull().default("draft"),
+    status: contractStatusEnum("status").notNull().default("sent"),
     acceptedAt: timestamp("accepted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),

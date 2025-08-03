@@ -40,6 +40,12 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+interface ExtendedFormData extends FormData {
+  deliverables: Deliverable[];
+  contractorNames: string[];
+  clientNames: string[];
+}
+
 interface NewContractFormProps {
   contractors: Array<{
     id: string;
@@ -65,7 +71,7 @@ interface NewContractFormProps {
   }>;
   currentUserId?: string;
   currentUserType?: "client" | "contractor";
-  onGenerate: (data: FormData) => void;
+  onGenerate: (data: ExtendedFormData) => void;
 }
 
 export function NewContractForm({ 
@@ -134,9 +140,25 @@ export function NewContractForm({
 
     setIsGenerating(true);
     try {
+      // Get contractor names from IDs
+      const selectedContractors = contractors.filter(c => 
+        values.contractors.includes(c.id)
+      ).map(c => `${c.firstName} ${c.lastName}`);
+
+      // Get client names from IDs  
+      const selectedClients = clients.filter(c => 
+        values.companies.includes(c.id)
+      ).map(c => c.clientProfile?.companyName || `${c.firstName} ${c.lastName}`);
+
       // Simulate AI contract generation
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      onGenerate({ ...values, deliverables });
+      
+      onGenerate({ 
+        ...values, 
+        deliverables,
+        contractorNames: selectedContractors,
+        clientNames: selectedClients
+      });
     } catch (error) {
       toast.error("Error generating contract");
     } finally {

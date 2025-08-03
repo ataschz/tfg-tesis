@@ -23,6 +23,35 @@ export function ContractList({ contracts, type }: ContractListProps) {
 
   const safeContracts = contracts || [];
 
+  // Define status options based on contract type
+  const getStatusOptions = () => {
+    const commonStatuses = [
+      { value: "all", label: "Todos los estados" },
+      { value: "in_dispute", label: "En Disputa" },
+      { value: "cancelled", label: "Cancelados" },
+      { value: "completed", label: "Completados" },
+      { value: "in_progress", label: "En Proceso" },
+      { value: "rejected", label: "Rechazados" },
+      { value: "accepted", label: "Aceptados" },
+    ];
+
+    if (type === "sent") {
+      // For sent contracts, add "Enviados" status
+      return [
+        ...commonStatuses,
+        { value: "sent", label: "Enviados" },
+      ];
+    } else {
+      // For received contracts, add "Recibidos" status (maps to "sent" in DB)
+      return [
+        ...commonStatuses,
+        { value: "sent", label: "Recibidos" },
+      ];
+    }
+  };
+
+  const statusOptions = getStatusOptions();
+
   const filteredContracts = safeContracts.filter((contract) => {
     const matchesSearch =
       contract?.title?.toLowerCase().includes(search.toLowerCase()) ||
@@ -55,15 +84,11 @@ export function ContractList({ contracts, type }: ContractListProps) {
               <SelectValue placeholder="Filtrar por estado" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos los estados</SelectItem>
-              <SelectItem value="draft">Borradores</SelectItem>
-              <SelectItem value="sent">Enviados</SelectItem>
-              <SelectItem value="accepted">Aceptados</SelectItem>
-              <SelectItem value="rejected">Rechazados</SelectItem>
-              <SelectItem value="in_progress">En Progreso</SelectItem>
-              <SelectItem value="completed">Completados</SelectItem>
-              <SelectItem value="cancelled">Cancelados</SelectItem>
-              <SelectItem value="in_dispute">En Disputa</SelectItem>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
