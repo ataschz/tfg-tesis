@@ -12,7 +12,7 @@ export default async function DashboardPage() {
       return <UnifiedDashboard />;
     case "mediator":
       // Mediators use their separate admin dashboard
-      redirect("/disputes");
+      redirect("/admin/disputes");
     default:
       redirect("/signin");
   }

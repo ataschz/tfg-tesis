@@ -7,6 +7,7 @@ export default async function DashboardRootPage() {
 
   // Redirect mediators to admin
   if (user.role === "mediator") {
+    console.log("redirecting to admin");
     redirect("/admin");
   }
 

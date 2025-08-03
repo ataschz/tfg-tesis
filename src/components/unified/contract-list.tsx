@@ -14,7 +14,7 @@ import { Search } from "lucide-react";
 
 interface ContractListProps {
   contracts: any[];
-  type: "received" | "sent";
+  type: "received" | "sent" | "disputed";
 }
 
 export function ContractList({ contracts, type }: ContractListProps) {
@@ -67,7 +67,11 @@ export function ContractList({ contracts, type }: ContractListProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold">
-          {type === "received" ? "Contratos Recibidos" : "Contratos Enviados"}
+          {type === "received" 
+            ? "Contratos Recibidos" 
+            : type === "sent" 
+            ? "Contratos Enviados"
+            : "Contratos en Disputa"}
         </h2>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative">
@@ -79,18 +83,20 @@ export function ContractList({ contracts, type }: ContractListProps) {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filtrar por estado" />
-            </SelectTrigger>
-            <SelectContent>
-              {statusOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {type !== "disputed" && (
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filtrar por estado" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
       </div>
 

@@ -5,11 +5,21 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Building2, Users, Star, FileText, AlertTriangle } from 'lucide-react';
 
 interface DisputePartiesProps {
-  company: any;
-  contractor: any;
+  clients: Array<{
+    id: string;
+    name: string;
+    email: string;
+    isPrimary: boolean;
+  }>;
+  contractors: Array<{
+    id: string;
+    name: string;
+    email: string;
+    isPrimary: boolean;
+  }>;
 }
 
-export function DisputeParties({ company, contractor }: DisputePartiesProps) {
+export function DisputeParties({ clients, contractors }: DisputePartiesProps) {
   return (
     <div className="space-y-6">
       <Card className="overflow-hidden">
@@ -19,74 +29,47 @@ export function DisputeParties({ company, contractor }: DisputePartiesProps) {
               <Building2 className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold">Empresa</h3>
-              <p className="text-sm text-muted-foreground">Parte contratante</p>
+              <h3 className="font-semibold">Clientes</h3>
+              <p className="text-sm text-muted-foreground">Parte contratante ({clients.length} usuario{clients.length > 1 ? 's' : ''})</p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 ring-4 ring-primary/10">
-                <AvatarImage 
-                  src={`https://avatar.vercel.sh/${company.name}`}
-                  alt={company.name}
-                />
-                <AvatarFallback>{company.name[0]}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h4 className="font-medium">{company.name}</h4>
-                <p className="text-sm text-muted-foreground">{company.email}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 rounded-lg border bg-card/50 p-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-muted-foreground">Rating</span>
+            {clients.map((client, index) => (
+              <div key={client.id} className={`${index > 0 ? 'border-t pt-4' : ''}`}>
+                <div className="flex items-center gap-4 mb-3">
+                  <Avatar className="h-12 w-12 ring-2 ring-primary/10">
+                    <AvatarImage 
+                      src={`https://avatar.vercel.sh/${client.name}`}
+                      alt={client.name}
+                    />
+                    <AvatarFallback>{client.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-medium">{client.name}</h4>
+                      {client.isPrimary && (
+                        <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                          Principal
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">{client.email}</p>
+                  </div>
                 </div>
-                <p className="font-medium">{company.rating}/5.0</p>
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-primary" />
-                  <span className="text-sm text-muted-foreground">Contratos</span>
-                </div>
-                <p className="font-medium">{company.totalContracts}</p>
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-2 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-primary" />
-                <span className="text-sm text-muted-foreground">Tasa de Disputas</span>
-              </div>
-              <div className="h-2 rounded-full bg-muted">
-                <div 
-                  className="h-2 rounded-full bg-primary" 
-                  style={{ width: `${company.disputeRate * 100}%` }}
-                />
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {(company.disputeRate * 100).toFixed(1)}% de contratos con disputas
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Reseñas Recientes</h4>
-              {company.reviews.map((review: any) => (
-                <div key={review.id} className="rounded-lg border bg-card/50 p-4">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm font-medium">{review.author}</span>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3 w-3 fill-primary text-primary" />
-                      <span className="text-sm">{review.rating}</span>
+                
+                <div className="rounded-lg border bg-card/50 p-3">
+                  <div className="text-sm">
+                    <div className="mb-1">
+                      <span className="font-medium">ID:</span> <span className="font-mono text-xs">{client.id}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Rol:</span> {client.isPrimary ? 'Cliente Principal' : 'Cliente Adicional'}
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">{review.comment}</p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </Card>
@@ -98,74 +81,47 @@ export function DisputeParties({ company, contractor }: DisputePartiesProps) {
               <Users className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-              <h3 className="font-semibold">Contratista</h3>
-              <p className="text-sm text-muted-foreground">Proveedor de servicios</p>
+              <h3 className="font-semibold">Contratistas</h3>
+              <p className="text-sm text-muted-foreground">Proveedor{contractors.length > 1 ? 'es' : ''} de servicios ({contractors.length} usuario{contractors.length > 1 ? 's' : ''})</p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <Avatar className="h-16 w-16 ring-4 ring-blue-500/10">
-                <AvatarImage 
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contractor.name}`}
-                  alt={contractor.name}
-                />
-                <AvatarFallback>{contractor.name[0]}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h4 className="font-medium">{contractor.name}</h4>
-                <p className="text-sm text-muted-foreground">{contractor.email}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 rounded-lg border bg-card/50 p-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <Star className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm text-muted-foreground">Rating</span>
+            {contractors.map((contractor, index) => (
+              <div key={contractor.id} className={`${index > 0 ? 'border-t pt-4' : ''}`}>
+                <div className="flex items-center gap-4 mb-3">
+                  <Avatar className="h-12 w-12 ring-2 ring-blue-500/10">
+                    <AvatarImage 
+                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contractor.name}`}
+                      alt={contractor.name}
+                    />
+                    <AvatarFallback>{contractor.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-medium">{contractor.name}</h4>
+                      {contractor.isPrimary && (
+                        <span className="inline-flex items-center rounded-full bg-blue-500/10 px-2 py-1 text-xs font-medium text-blue-500">
+                          Principal
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">{contractor.email}</p>
+                  </div>
                 </div>
-                <p className="font-medium">{contractor.rating}/5.0</p>
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm text-muted-foreground">Contratos</span>
-                </div>
-                <p className="font-medium">{contractor.totalContracts}</p>
-              </div>
-            </div>
-
-            <div>
-              <div className="mb-2 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-blue-500" />
-                <span className="text-sm text-muted-foreground">Tasa de Disputas</span>
-              </div>
-              <div className="h-2 rounded-full bg-muted">
-                <div 
-                  className="h-2 rounded-full bg-blue-500" 
-                  style={{ width: `${contractor.disputeRate * 100}%` }}
-                />
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {(contractor.disputeRate * 100).toFixed(1)}% de contratos con disputas
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Reseñas Recientes</h4>
-              {contractor.reviews.map((review: any) => (
-                <div key={review.id} className="rounded-lg border bg-card/50 p-4">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm font-medium">{review.author}</span>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3 w-3 fill-blue-500 text-blue-500" />
-                      <span className="text-sm">{review.rating}</span>
+                
+                <div className="rounded-lg border bg-card/50 p-3">
+                  <div className="text-sm">
+                    <div className="mb-1">
+                      <span className="font-medium">ID:</span> <span className="font-mono text-xs">{contractor.id}</span>
+                    </div>
+                    <div>
+                      <span className="font-medium">Rol:</span> {contractor.isPrimary ? 'Contratista Principal' : 'Contratista Adicional'}
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">{review.comment}</p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </Card>

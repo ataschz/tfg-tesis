@@ -12,8 +12,8 @@ import {
 interface DisputesStatsProps {
   stats: {
     total: number;
-    pending: number;
-    inProgress: number;
+    open: number;
+    in_progress: number;
     resolved: number;
     escalated: number;
   };
@@ -28,9 +28,9 @@ export function DisputesStats({ stats }: DisputesStatsProps) {
             <Clock className="h-5 w-5 text-yellow-500" />
           </div>
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Pendientes</p>
+            <p className="text-sm font-medium text-muted-foreground">Abiertas</p>
             <div className="flex items-center gap-2">
-              <p className="text-2xl font-bold">{stats.pending}</p>
+              <p className="text-2xl font-bold">{stats.open}</p>
               <span className="text-xs text-muted-foreground">disputas</span>
             </div>
           </div>
@@ -45,7 +45,7 @@ export function DisputesStats({ stats }: DisputesStatsProps) {
           <div>
             <p className="text-sm font-medium text-muted-foreground">En Proceso</p>
             <div className="flex items-center gap-2">
-              <p className="text-2xl font-bold">{stats.inProgress}</p>
+              <p className="text-2xl font-bold">{stats.in_progress}</p>
               <span className="text-xs text-muted-foreground">casos</span>
             </div>
           </div>

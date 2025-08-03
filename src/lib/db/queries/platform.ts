@@ -212,6 +212,14 @@ export async function getUserContractStats(
   userType: "client" | "contractor"
 ) {
   const userContracts = await getUserContracts(userId, userType);
+  
+  // Obtener pagos asociados a estos contratos
+  const contractIds = userContracts.map(c => c.id);
+  const contractPayments = contractIds.length > 0 
+    ? await db.query.payments.findMany({
+        where: inArray(payments.contractId, contractIds),
+      })
+    : [];
 
   const activeContracts = userContracts.filter(
     (contract) =>
@@ -222,15 +230,35 @@ export async function getUserContractStats(
     (contract) => contract.status === "completed"
   );
 
-  // Calculate total earnings/spending
-  const totalAmount = userContracts.reduce((sum, contract) => {
-    return sum + Number(contract.amount);
-  }, 0);
+  // Para contratistas: solo contar dinero realmente liberado
+  // Para clientes: contar todo el dinero gastado en contratos
+  let totalAmount = 0;
+  let escrowAmount = 0;
+  let availableAmount = 0;
 
-  // Calculate escrow amount (contracts in progress)
-  const escrowAmount = activeContracts.reduce((sum, contract) => {
-    return sum + Number(contract.amount);
-  }, 0);
+  if (userType === "contractor") {
+    // Solo contar pagos liberados como ingresos reales
+    availableAmount = contractPayments
+      .filter(p => p.status === "released")
+      .reduce((sum, payment) => sum + Number(payment.amount), 0);
+    
+    // Dinero en escrow: pagos en estado "held"
+    escrowAmount = contractPayments
+      .filter(p => p.status === "held")
+      .reduce((sum, payment) => sum + Number(payment.amount), 0);
+    
+    totalAmount = availableAmount + escrowAmount;
+  } else {
+    // Para clientes: contar todo el dinero comprometido
+    totalAmount = userContracts.reduce((sum, contract) => {
+      return sum + Number(contract.amount);
+    }, 0);
+    
+    // Para clientes, escrow es dinero en contratos activos
+    escrowAmount = activeContracts.reduce((sum, contract) => {
+      return sum + Number(contract.amount);
+    }, 0);
+  }
 
   return {
     totalContracts: userContracts.length,
@@ -238,7 +266,9 @@ export async function getUserContractStats(
     completedContracts: completedContracts.length,
     totalAmount,
     escrowAmount,
+    availableAmount,
     contracts: userContracts,
+    payments: contractPayments,
   };
 }
 

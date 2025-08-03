@@ -25,6 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DisputeDialog } from "@/components/disputes/dispute-dialog";
 import {
   Calendar,
   MoreVertical,
@@ -44,7 +45,7 @@ import { cn } from "@/lib/utils";
 
 interface ContractCardProps {
   contract: any; // TODO: Add proper type
-  type: "received" | "sent";
+  type: "received" | "sent" | "disputed";
 }
 
 export function ContractCard({ contract, type }: ContractCardProps) {
@@ -56,7 +57,7 @@ export function ContractCard({ contract, type }: ContractCardProps) {
   const endDate = new Date(contract.endDate);
   const isActive = contract.status === "active" || contract.status === "in_progress";
 
-  const getStatusInfo = (status: string, contractType: "received" | "sent") => {
+  const getStatusInfo = (status: string, contractType: "received" | "sent" | "disputed") => {
     switch (status) {
       case "sent":
         return {
@@ -132,10 +133,12 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                   <Eye className="mr-2 h-4 w-4" />
                   Ver detalle
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setShowDisputeDialog(true)}>
-                  <AlertTriangle className="mr-2 h-4 w-4" />
-                  Iniciar disputa
-                </DropdownMenuItem>
+                {type !== "disputed" && contract.status !== "in_dispute" && (
+                  <DropdownMenuItem onClick={() => setShowDisputeDialog(true)}>
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    Iniciar disputa
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -273,41 +276,17 @@ export function ContractCard({ contract, type }: ContractCardProps) {
 
 
       {/* Dispute Dialog */}
-      <Dialog open={showDisputeDialog} onOpenChange={setShowDisputeDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Iniciar Disputa</DialogTitle>
-            <DialogDescription>
-              ¿Estás seguro de que deseas iniciar una disputa para este
-              contrato? Nuestro equipo revisará el caso y te contactará en
-              breve.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowDisputeDialog(false)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                setIsSubmitting(true);
-                // TODO: Implement dispute initiation
-                setTimeout(() => {
-                  toast.success("Disputa iniciada correctamente");
-                  setShowDisputeDialog(false);
-                  setIsSubmitting(false);
-                }, 1000);
-              }}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Iniciando..." : "Iniciar Disputa"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DisputeDialog
+        open={showDisputeDialog}
+        onOpenChange={setShowDisputeDialog}
+        contractId={contract.id}
+        contractTitle={contract.title}
+        milestones={contract.deliverables?.map((deliverable: any, index: number) => ({
+          id: `deliverable-${index}`,
+          title: deliverable.title || `Entregable ${index + 1}`,
+          description: deliverable.description || deliverable
+        })) || []}
+      />
     </>
   );
 }

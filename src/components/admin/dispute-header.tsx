@@ -8,6 +8,8 @@ import {
   Clock,
   AlertTriangle,
   DollarSign,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -18,17 +20,29 @@ interface DisputeHeaderProps {
 }
 
 const statusConfig = {
-  pending: {
-    label: 'Pendiente',
+  open: {
+    label: 'Abierta',
     icon: Clock,
     color: 'text-yellow-500',
     bg: 'bg-yellow-500/10',
   },
-  in_progress: {
-    label: 'En Proceso',
+  under_review: {
+    label: 'En Revisión',
     icon: Scale,
     color: 'text-blue-500',
     bg: 'bg-blue-500/10',
+  },
+  resolved: {
+    label: 'Resuelta',
+    icon: CheckCircle2,
+    color: 'text-green-500',
+    bg: 'bg-green-500/10',
+  },
+  closed: {
+    label: 'Cerrada',
+    icon: XCircle,
+    color: 'text-gray-500',
+    bg: 'bg-gray-500/10',
   },
 };
 
@@ -41,8 +55,8 @@ const priorityConfig = {
 };
 
 export function DisputeHeader({ dispute }: DisputeHeaderProps) {
-  const status = statusConfig[dispute.status as keyof typeof statusConfig];
-  const priority = priorityConfig[dispute.priority as keyof typeof priorityConfig];
+  const status = statusConfig[dispute.status as keyof typeof statusConfig] || statusConfig.open;
+  const priority = priorityConfig[dispute.priority as keyof typeof priorityConfig] || { label: 'Media', color: 'text-blue-500', bg: 'bg-blue-500/10' };
   const StatusIcon = status.icon;
 
   return (
@@ -87,7 +101,7 @@ export function DisputeHeader({ dispute }: DisputeHeaderProps) {
           <div>
             <p className="text-sm text-muted-foreground">Monto en Disputa</p>
             <p className="font-medium">
-              {dispute.currency} {dispute.amount.toLocaleString()}
+              {dispute.contract?.currency || 'USD'} {Number(dispute.contract?.amount || 0).toLocaleString()}
             </p>
           </div>
         </div>

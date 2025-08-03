@@ -1,160 +1,110 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { 
-  CheckCircle2, 
-  AlertTriangle,
   Loader2,
+  UserPlus,
+  Users,
+  Building2,
 } from 'lucide-react';
 
 interface DisputeActionsProps {
-  onResolve: (resolution: string) => Promise<void>;
-  onEscalate: (reason: string) => Promise<void>;
+  dispute: any;
+  onResolve: (resolution: string, resolutionDetails: string, winnerId?: string) => Promise<void>;
+  onAssignMediator: () => Promise<void>;
   isSubmitting: boolean;
 }
 
 export function DisputeActions({ 
+  dispute,
   onResolve, 
-  onEscalate,
+  onAssignMediator,
   isSubmitting 
 }: DisputeActionsProps) {
-  const [showResolveDialog, setShowResolveDialog] = useState(false);
-  const [showEscalateDialog, setShowEscalateDialog] = useState(false);
-  const [resolution, setResolution] = useState('');
-  const [escalationReason, setEscalationReason] = useState('');
 
-  const handleResolve = async () => {
-    await onResolve(resolution);
-    setShowResolveDialog(false);
-    setResolution('');
-  };
+  const canAssignSelf = !dispute.mediatorId;
+  const canResolve = dispute.status === 'open' || dispute.status === 'under_review';
+  const isAssigned = dispute.mediatorId;
 
-  const handleEscalate = async () => {
-    await onEscalate(escalationReason);
-    setShowEscalateDialog(false);
-    setEscalationReason('');
+
+  const handleQuickResolve = async (party: 'contractor' | 'client') => {
+    const winnerId = party === 'contractor' 
+      ? dispute.contract.contractor.id 
+      : dispute.contract.client.id;
+    
+    const resolution = party === 'contractor' ? 'completed' : 'refund';
+    const resolutionDetails = party === 'contractor'
+      ? 'El mediador ha determinado que el contratista ha cumplido satisfactoriamente con los términos del contrato. Se procede a completar el contrato y liberar el pago.'
+      : 'El mediador ha determinado que el cliente tiene razón en su disputa. Se procede a realizar el reembolso correspondiente.';
+    
+    await onResolve(resolution, resolutionDetails, winnerId);
   };
 
   return (
     <>
       <Card className="p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={() => setShowEscalateDialog(true)}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <AlertTriangle className="h-4 w-4 text-destructive" />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Acciones de Mediación</h3>
+          
+          <div className="flex flex-col gap-3">
+            {canAssignSelf && (
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={onAssignMediator}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <UserPlus className="h-4 w-4" />
+                )}
+                Asignarme como Mediador
+              </Button>
             )}
-            Escalar Disputa
-          </Button>
-          <Button
-            className="gap-2"
-            onClick={() => setShowResolveDialog(true)}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CheckCircle2 className="h-4 w-4" />
+            
+            {isAssigned && canResolve && (
+              <div className="space-y-2">
+                <Button
+                  className="gap-2 w-full"
+                  onClick={() => handleQuickResolve('contractor')}
+                  disabled={isSubmitting}
+                  variant="default"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Users className="h-4 w-4" />
+                  )}
+                  Dar razón al Contratista
+                </Button>
+                
+                <Button
+                  className="gap-2 w-full"
+                  onClick={() => handleQuickResolve('client')}
+                  disabled={isSubmitting}
+                  variant="secondary"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Building2 className="h-4 w-4" />
+                  )}
+                  Dar razón al Cliente
+                </Button>
+              </div>
             )}
-            Resolver Disputa
-          </Button>
+            
+            {!canResolve && dispute.status === 'resolved' && (
+              <div className="text-sm text-muted-foreground bg-green-50 p-3 rounded">
+                Esta disputa ya ha sido resuelta.
+              </div>
+            )}
+          </div>
         </div>
       </Card>
 
-      <Dialog open={showResolveDialog} onOpenChange={setShowResolveDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Resolver Disputa</DialogTitle>
-            <DialogDescription>
-              Describe la resolución y las acciones tomadas para resolver esta disputa.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <Textarea
-              placeholder="Detalla la resolución..."
-              value={resolution}
-              onChange={(e) => setResolution(e.target.value)}
-              rows={4}
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowResolveDialog(false)}
-              disabled={isSubmitting}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleResolve}
-              disabled={isSubmitting || !resolution.trim()}
-            >
-              {isSubmitting ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <CheckCircle2 className="mr-2 h-4 w-4" />
-              )}
-              Confirmar Resolución
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showEscalateDialog} onOpenChange={setShowEscalateDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Escalar Disputa</DialogTitle>
-            <DialogDescription>
-              Explica por qué esta disputa necesita ser escalada a un nivel superior.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <Textarea
-              placeholder="Motivo de escalación..."
-              value={escalationReason}
-              onChange={(e) => setEscalationReason(e.target.value)}
-              rows={4}
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowEscalateDialog(false)}
-              disabled={isSubmitting}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleEscalate}
-              disabled={isSubmitting || !escalationReason.trim()}
-            >
-              {isSubmitting ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <AlertTriangle className="mr-2 h-4 w-4" />
-              )}
-              Confirmar Escalación
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
