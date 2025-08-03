@@ -97,6 +97,18 @@ export const paymentMethodEnum = pgEnum("payment_method", [
   "wire",
 ]);
 
+export const accountTransactionTypeEnum = pgEnum("account_transaction_type", [
+  "deposit",
+  "withdrawal",
+  "contract_payment",
+  "contract_refund",
+]);
+
+export const accountTransactionStatusEnum = pgEnum(
+  "account_transaction_status",
+  ["pending", "completed", "failed", "cancelled"]
+);
+
 export const disputeInitiatorEnum = pgEnum("dispute_initiator", [
   "contractor",
   "client",
@@ -493,6 +505,66 @@ export const statusHistory = pgTable(
   })
 );
 
+// Account Balances Table
+export const accountBalances = pgTable(
+  "account_balances",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userProfileId: uuid("user_profile_id")
+      .references(() => userProfiles.id, { onDelete: "cascade" })
+      .notNull(),
+    availableBalance: decimal("available_balance", { precision: 12, scale: 2 })
+      .notNull()
+      .default("0"),
+    currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+    lastUpdated: timestamp("last_updated", { withTimezone: true }).defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => ({
+    userProfileIdIdx: index("idx_account_balances_user_profile_id").on(
+      table.userProfileId
+    ),
+  })
+);
+
+// Account Transactions Table
+export const accountTransactions = pgTable(
+  "account_transactions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userProfileId: uuid("user_profile_id")
+      .references(() => userProfiles.id, { onDelete: "cascade" })
+      .notNull(),
+    type: accountTransactionTypeEnum("type").notNull(),
+    amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+    currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+    status: accountTransactionStatusEnum("status").notNull().default("pending"),
+    paymentMethod: paymentMethodEnum("payment_method"),
+    transactionReference: varchar("transaction_reference", { length: 200 }),
+    description: text("description"),
+    processingFee: decimal("processing_fee", {
+      precision: 10,
+      scale: 2,
+    }).default("0"),
+    contractId: uuid("contract_id").references(() => contracts.id, {
+      onDelete: "set null",
+    }), // Optional, for contract-related transactions
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => ({
+    userProfileIdIdx: index("idx_account_transactions_user_profile_id").on(
+      table.userProfileId
+    ),
+    typeIdx: index("idx_account_transactions_type").on(table.type),
+    statusIdx: index("idx_account_transactions_status").on(table.status),
+    contractIdIdx: index("idx_account_transactions_contract_id").on(
+      table.contractId
+    ),
+  })
+);
+
 // Relations
 export const userProfilesRelations = relations(
   userProfiles,
@@ -518,6 +590,8 @@ export const userProfilesRelations = relations(
     reviewsGiven: many(reviews, { relationName: "reviewsGiven" }),
     reviewsReceived: many(reviews, { relationName: "reviewsReceived" }),
     notifications: many(notifications),
+    accountBalance: one(accountBalances),
+    accountTransactions: many(accountTransactions),
   })
 );
 
@@ -692,6 +766,35 @@ export const contractContractorsRelations = relations(
   })
 );
 
+export const accountBalancesRelations = relations(
+  accountBalances,
+  ({ one, many }) => ({
+    userProfile: one(userProfiles, {
+      fields: [accountBalances.userProfileId],
+      references: [userProfiles.id],
+    }),
+    transactions: many(accountTransactions),
+  })
+);
+
+export const accountTransactionsRelations = relations(
+  accountTransactions,
+  ({ one }) => ({
+    userProfile: one(userProfiles, {
+      fields: [accountTransactions.userProfileId],
+      references: [userProfiles.id],
+    }),
+    accountBalance: one(accountBalances, {
+      fields: [accountTransactions.userProfileId],
+      references: [accountBalances.userProfileId],
+    }),
+    contract: one(contracts, {
+      fields: [accountTransactions.contractId],
+      references: [contracts.id],
+    }),
+  })
+);
+
 // Type exports for TypeScript
 export type AuthUser = typeof user.$inferSelect;
 export type UserProfile = typeof userProfiles.$inferSelect;
@@ -722,3 +825,7 @@ export type ContractClient = typeof contractClients.$inferSelect;
 export type NewContractClient = typeof contractClients.$inferInsert;
 export type ContractContractor = typeof contractContractors.$inferSelect;
 export type NewContractContractor = typeof contractContractors.$inferInsert;
+export type AccountBalance = typeof accountBalances.$inferSelect;
+export type NewAccountBalance = typeof accountBalances.$inferInsert;
+export type AccountTransaction = typeof accountTransactions.$inferSelect;
+export type NewAccountTransaction = typeof accountTransactions.$inferInsert;

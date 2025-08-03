@@ -7,6 +7,47 @@
 -- - Reseñas y calificaciones
 -- - Notificaciones
 
+-- Limpiar datos existentes
+
+DELETE FROM
+    dispute_evidence;
+
+DELETE FROM
+    disputes;
+
+DELETE FROM
+    reviews;
+
+DELETE FROM
+    payments;
+
+DELETE FROM
+    milestones;
+
+DELETE FROM
+    status_history;
+
+DELETE FROM
+    contract_clients;
+
+DELETE FROM
+    contract_contractors;
+
+DELETE FROM
+    contracts;
+
+DELETE FROM
+    subscriptions;
+
+DELETE FROM
+    notifications;
+
+DELETE FROM
+    client_profiles;
+
+DELETE FROM
+    contractor_profiles;
+
 -- ========================================
 -- PERFILES DE USUARIO COMPLETOS
 -- ========================================

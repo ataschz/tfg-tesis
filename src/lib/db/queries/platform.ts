@@ -81,9 +81,9 @@ export async function getUserContracts(
       .select({ contractId: contractClients.contractId })
       .from(contractClients)
       .where(eq(contractClients.clientId, userId));
-    
-    const contractIds = clientContractIds.map(c => c.contractId);
-    
+
+    const contractIds = clientContractIds.map((c) => c.contractId);
+
     if (contractIds.length === 0) {
       // Also check primary client field for backward compatibility
       return await db.query.contracts.findMany({
@@ -102,7 +102,7 @@ export async function getUserContracts(
         },
       });
     }
-    
+
     return await db.query.contracts.findMany({
       where: or(
         eq(contracts.clientId, userId),
@@ -127,9 +127,9 @@ export async function getUserContracts(
       .select({ contractId: contractContractors.contractId })
       .from(contractContractors)
       .where(eq(contractContractors.contractorId, userId));
-    
-    const contractIds = contractorContractIds.map(c => c.contractId);
-    
+
+    const contractIds = contractorContractIds.map((c) => c.contractId);
+
     if (contractIds.length === 0) {
       // Also check primary contractor field for backward compatibility
       return await db.query.contracts.findMany({
@@ -148,7 +148,7 @@ export async function getUserContracts(
         },
       });
     }
-    
+
     return await db.query.contracts.findMany({
       where: or(
         eq(contracts.contractorId, userId),
@@ -212,14 +212,15 @@ export async function getUserContractStats(
   userType: "client" | "contractor"
 ) {
   const userContracts = await getUserContracts(userId, userType);
-  
+
   // Obtener pagos asociados a estos contratos
-  const contractIds = userContracts.map(c => c.id);
-  const contractPayments = contractIds.length > 0 
-    ? await db.query.payments.findMany({
-        where: inArray(payments.contractId, contractIds),
-      })
-    : [];
+  const contractIds = userContracts.map((c) => c.id);
+  const contractPayments =
+    contractIds.length > 0
+      ? await db.query.payments.findMany({
+          where: inArray(payments.contractId, contractIds),
+        })
+      : [];
 
   const activeContracts = userContracts.filter(
     (contract) =>
@@ -239,21 +240,21 @@ export async function getUserContractStats(
   if (userType === "contractor") {
     // Solo contar pagos liberados como ingresos reales
     availableAmount = contractPayments
-      .filter(p => p.status === "released")
+      .filter((p) => p.status === "released")
       .reduce((sum, payment) => sum + Number(payment.amount), 0);
-    
+
     // Dinero en escrow: pagos en estado "held"
     escrowAmount = contractPayments
-      .filter(p => p.status === "held")
+      .filter((p) => p.status === "held")
       .reduce((sum, payment) => sum + Number(payment.amount), 0);
-    
+
     totalAmount = availableAmount + escrowAmount;
   } else {
     // Para clientes: contar todo el dinero comprometido
     totalAmount = userContracts.reduce((sum, contract) => {
       return sum + Number(contract.amount);
     }, 0);
-    
+
     // Para clientes, escrow es dinero en contratos activos
     escrowAmount = activeContracts.reduce((sum, contract) => {
       return sum + Number(contract.amount);
