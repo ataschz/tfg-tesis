@@ -49,15 +49,59 @@ export function ContractCard({ contract, type }: ContractCardProps) {
 
   const startDate = new Date(contract.startDate);
   const endDate = new Date(contract.endDate);
-  const isActive = contract.status === "active";
+  const isActive = contract.status === "active" || contract.status === "in_progress";
 
-  const status = {
-    text: contract.status === "active" ? "Activo" : "Finalizado",
-    badge:
-      contract.status === "active"
-        ? "bg-emerald-500/10 text-emerald-500"
-        : "bg-slate-500/10 text-slate-500",
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case "draft":
+        return {
+          text: "Borrador",
+          badge: "bg-yellow-500/10 text-yellow-600",
+        };
+      case "sent":
+        return {
+          text: "Enviado",
+          badge: "bg-blue-500/10 text-blue-600",
+        };
+      case "accepted":
+        return {
+          text: "Aceptado",
+          badge: "bg-green-500/10 text-green-600",
+        };
+      case "rejected":
+        return {
+          text: "Rechazado",
+          badge: "bg-red-500/10 text-red-600",
+        };
+      case "in_progress":
+        return {
+          text: "En Progreso",
+          badge: "bg-emerald-500/10 text-emerald-600",
+        };
+      case "completed":
+        return {
+          text: "Completado",
+          badge: "bg-purple-500/10 text-purple-600",
+        };
+      case "cancelled":
+        return {
+          text: "Cancelado",
+          badge: "bg-gray-500/10 text-gray-600",
+        };
+      case "in_dispute":
+        return {
+          text: "En Disputa",
+          badge: "bg-orange-500/10 text-orange-600",
+        };
+      default:
+        return {
+          text: "Desconocido",
+          badge: "bg-slate-500/10 text-slate-500",
+        };
+    }
   };
+
+  const status = getStatusInfo(contract.status);
 
   const handleDownload = async () => {
     try {
@@ -170,27 +214,29 @@ export function ContractCard({ contract, type }: ContractCardProps) {
               <div className="flex flex-col items-center gap-2">
                 <div className="flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    Contratantes ({contract.companies.length})
-                  </span>
+                  <span className="text-sm text-muted-foreground">Cliente</span>
                 </div>
                 <div className="flex -space-x-2">
-                  {contract.companies.map((company: any) => (
-                    <Link
-                      key={company.id}
-                      href={`/dashboard/company/${company.id}`}
-                    >
+                  {contract.client && (
+                    <Link href={`/dashboard/client/${contract.client.id}`}>
                       <Avatar className="h-8 w-8 border-2 border-background transition-transform hover:scale-105 hover:z-10">
                         <AvatarImage
-                          src={`https://avatar.vercel.sh/${company.companyName}`}
-                          alt={company.companyName}
+                          src={`https://avatar.vercel.sh/${
+                            contract.client.company || contract.client.firstName
+                          }`}
+                          alt={
+                            contract.client.company ||
+                            `${contract.client.firstName} ${contract.client.lastName}`
+                          }
                         />
                         <AvatarFallback>
-                          {company.companyName[0]}
+                          {contract.client.company
+                            ? contract.client.company[0]
+                            : contract.client.firstName[0]}
                         </AvatarFallback>
                       </Avatar>
                     </Link>
-                  ))}
+                  )}
                 </div>
               </div>
 
@@ -201,27 +247,26 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                 <div className="flex items-center gap-2">
                   <Users2 className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">
-                    Contratistas ({contract.contractors.length})
+                    Contratista
                   </span>
                 </div>
                 <div className="flex -space-x-2">
-                  {contract.contractors.map((contractor: any) => (
+                  {contract.contractor && (
                     <Link
-                      key={contractor.id}
-                      href={`/dashboard/contractor/${contractor.id}`}
+                      href={`/dashboard/contractor/${contract.contractor.id}`}
                     >
                       <Avatar className="h-8 w-8 border-2 border-background transition-transform hover:scale-105 hover:z-10">
                         <AvatarImage
-                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contractor.firstName}`}
-                          alt={`${contractor.firstName} ${contractor.lastName}`}
+                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${contract.contractor.firstName}`}
+                          alt={`${contract.contractor.firstName} ${contract.contractor.lastName}`}
                         />
                         <AvatarFallback>
-                          {contractor.firstName[0]}
-                          {contractor.lastName[0]}
+                          {contract.contractor.firstName[0]}
+                          {contract.contractor.lastName[0]}
                         </AvatarFallback>
                       </Avatar>
                     </Link>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>

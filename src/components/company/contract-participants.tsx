@@ -12,7 +12,32 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-export function ContractParticipants() {
+interface ContractParticipantsProps {
+  contractors: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    contractorProfile?: {
+      skills: string[];
+      hourlyRate: string;
+      bio: string;
+    } | null;
+  }>;
+  clients: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    clientProfile?: {
+      companyName: string;
+      companyDescription: string;
+      industry: string;
+    } | null;
+  }>;
+}
+
+export function ContractParticipants({ contractors, clients }: ContractParticipantsProps) {
   const { control } = useFormContext();
 
   return (
@@ -45,6 +70,8 @@ export function ContractParticipants() {
                     type="contractor"
                     value={field.value}
                     onChange={field.onChange}
+                    contractors={contractors}
+                    clients={clients}
                   />
                 </FormControl>
                 <FormMessage />
@@ -66,6 +93,8 @@ export function ContractParticipants() {
                     type="company"
                     value={field.value}
                     onChange={field.onChange}
+                    contractors={contractors}
+                    clients={clients}
                   />
                 </FormControl>
                 <FormMessage />

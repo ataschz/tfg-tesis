@@ -21,11 +21,12 @@ import { WithdrawalDialog } from './withdrawal-dialog';
 interface UnifiedStatsProps {
   stats: {
     totalActiveContracts: number;
-    totalPendingAmount: number;
-    totalEscrowAmount: number;
-    totalEarnedThisMonth: number;
+    totalInProgressAmount: number;
+    totalAvailableAmount: number;
+    totalInDisputeAmount: number;
+    totalInDisputeContracts: number;
     currency: string;
-    userName?: string;
+    userName: string;
   };
 }
 
@@ -33,7 +34,7 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
   const [showBalance, setShowBalance] = useState(true);
   const [showWithdrawalDialog, setShowWithdrawalDialog] = useState(false);
   
-  const totalBalance = stats.totalEarnedThisMonth + stats.totalEscrowAmount + stats.totalPendingAmount;
+  const totalBalance = stats.totalAvailableAmount + stats.totalInProgressAmount + stats.totalInDisputeAmount;
 
   const formatBalance = (amount: number) => {
     if (showBalance) {
@@ -47,7 +48,7 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
       {/* Saludo y descripción */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold">
-          ¡Hola, Ata Herrera{stats.userName ? `, ${stats.userName}` : ''}! 👋
+          ¡Hola{stats.userName ? `, ${stats.userName}` : ''}! 👋
         </h1>
         <p className="text-lg text-muted-foreground">
           Gestiona todos tus contratos, pagos y transacciones desde un solo lugar.
@@ -83,10 +84,7 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
                 <h2 className="text-5xl font-bold text-white md:text-6xl">
                   {stats.currency} {formatBalance(totalBalance)}
                 </h2>
-                <div className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-sm text-emerald-400">
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  <span>+15%</span>
-                </div>
+                {/* Removed hardcoded percentage */}
               </div>
             </div>
 
@@ -95,7 +93,7 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
               <p className="text-lg text-slate-400">
                 Disponible para retirar:{' '}
                 <span className="font-semibold text-white">
-                  {stats.currency} {formatBalance(stats.totalEarnedThisMonth)}
+                  {stats.currency} {formatBalance(stats.totalAvailableAmount)}
                 </span>
               </p>
               <Button 
@@ -124,9 +122,9 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
                 <ShieldCheck className="h-6 w-6 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">En Escrow</p>
+                <p className="text-sm text-muted-foreground">En Disputa</p>
                 <p className="text-2xl font-bold">
-                  {stats.currency} {formatBalance(stats.totalEscrowAmount)}
+                  {stats.currency} {formatBalance(stats.totalInDisputeAmount)}
                 </p>
               </div>
             </div>
@@ -145,10 +143,12 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
                 <p className="text-sm text-muted-foreground">Contratos Activos</p>
                 <div className="flex items-center gap-3">
                   <p className="text-2xl font-bold">{stats.totalActiveContracts}</p>
-                  <div className="flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs text-red-500">
-                    <AlertTriangle className="h-3 w-3" />
-                    <span>2 en disputa</span>
-                  </div>
+                  {stats.totalInDisputeContracts > 0 && (
+                    <div className="flex items-center gap-1 rounded-full bg-red-500/10 px-2 py-0.5 text-xs text-red-500">
+                      <AlertTriangle className="h-3 w-3" />
+                      <span>{stats.totalInDisputeContracts} en disputa</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -164,12 +164,12 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
                 <Clock className="h-6 w-6 text-violet-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Próximos a Liberar</p>
+                <p className="text-sm text-muted-foreground">En Progreso</p>
                 <div className="flex items-center gap-2">
                   <p className="text-2xl font-bold">
-                    {stats.currency} {formatBalance(stats.totalPendingAmount)}
+                    {stats.currency} {formatBalance(stats.totalInProgressAmount)}
                   </p>
-                  <span className="text-xs text-muted-foreground">30d</span>
+                  <span className="text-xs text-muted-foreground">Aceptados + En curso</span>
                 </div>
               </div>
             </div>
@@ -180,7 +180,7 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
       <WithdrawalDialog
         open={showWithdrawalDialog}
         onOpenChange={setShowWithdrawalDialog}
-        availableAmount={stats.totalEarnedThisMonth}
+        availableAmount={stats.totalAvailableAmount}
         currency={stats.currency}
       />
     </div>

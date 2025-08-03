@@ -55,7 +55,7 @@ export async function requireAuth() {
 
   // Determine user role based on profile data
   let role: "client" | "contractor" | "mediator" = "client";
-  
+
   if (userProfile.userType === "contractor") {
     role = "contractor";
   } else if (userProfile.userType === "mediator") {

@@ -1,12 +1,49 @@
-"use client";
+import {
+  getActiveContractors,
+  getActiveClients,
+} from "@/lib/db/queries/platform";
+import { NewContractClient } from "@/components/company/new-contract-client";
+import { requireAuth } from "@/lib/auth";
 
-import { useState } from "react";
-import { NewContractForm } from "@/components/company/new-contract-form";
-import { ContractEditor } from "@/components/company/contract-editor";
+export default async function NewContractPage() {
+  const [contractors, clients, currentUser] = await Promise.all([
+    getActiveContractors(),
+    getActiveClients(),
+    requireAuth(),
+  ]);
 
-export default function NewContractPage() {
-  const [step, setStep] = useState(1);
-  const [contractData, setContractData] = useState(null);
+  const mappedContractors = contractors.map((contractor) => ({
+    id: contractor.id,
+    firstName: contractor.firstName,
+    lastName: contractor.lastName,
+    email: contractor.authUser?.email || "",
+    contractorProfile: contractor.contractorProfile
+      ? {
+          skills: contractor.contractorProfile.skills || [],
+          hourlyRate: contractor.contractorProfile.hourlyRate || "0",
+          bio: contractor.contractorProfile.bio || "",
+        }
+      : null,
+  }));
+
+  const mappedClients = clients.map((client) => ({
+    id: client.id,
+    firstName: client.firstName,
+    lastName: client.lastName,
+    email: client.authUser?.email || "",
+    clientProfile: client.clientProfile
+      ? {
+          companyName: client.clientProfile.company || "",
+          companyDescription: client.clientProfile.companyDescription || "",
+          industry: client.clientProfile.industry || "",
+        }
+      : null,
+  }));
+
+  const userType =
+    currentUser.role === "client" || currentUser.role === "contractor"
+      ? currentUser.role
+      : undefined;
 
   return (
     <div className="container space-y-6 pb-16">
@@ -18,67 +55,12 @@ export default function NewContractPage() {
         </p>
       </div>
 
-      <div className="space-y-6">
-        <div className="rounded-lg border bg-card p-4">
-          <div className="flex items-center gap-4">
-            <div
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                step === 1
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
-              1
-            </div>
-            <div>
-              <h3 className="font-semibold">Contract Information</h3>
-              <p className="text-sm text-muted-foreground">
-                Complete the basic contract details
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {step >= 2 && (
-          <div className="rounded-lg border bg-card p-4">
-            <div className="flex items-center gap-4">
-              <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                  step === 2
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                2
-              </div>
-              <div>
-                <h3 className="font-semibold">Review and Edit Contract</h3>
-                <p className="text-sm text-muted-foreground">
-                  Review and customize the AI-generated contract
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {step === 1 ? (
-        <NewContractForm
-          onGenerate={(data: any) => {
-            setContractData(data);
-            setStep(2);
-          }}
-        />
-      ) : (
-        <ContractEditor
-          initialData={contractData}
-          onBack={() => setStep(1)}
-          onSubmit={(finalContract) => {
-            console.log("Final contract:", finalContract);
-            // TODO: Handle contract submission
-          }}
-        />
-      )}
+      <NewContractClient
+        contractors={mappedContractors}
+        clients={mappedClients}
+        currentUserId={currentUser.profile.id}
+        currentUserType={userType}
+      />
     </div>
   );
 }

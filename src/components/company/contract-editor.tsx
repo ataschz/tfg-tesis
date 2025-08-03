@@ -19,12 +19,14 @@ import {
   Save,
 } from "lucide-react";
 import { format } from "date-fns";
-import Link from "next/link";
+import { createContract } from "@/lib/actions/contracts";
+import { toast } from "sonner";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface ContractEditorProps {
   initialData: any;
   onBack: () => void;
-  onSubmit: (contract: string) => void;
 }
 
 const generateInitialContent = (data: any) => {
@@ -112,8 +114,9 @@ const generateInitialContent = (data: any) => {
 export function ContractEditor({
   initialData,
   onBack,
-  onSubmit,
 }: ContractEditorProps) {
+  const [isSaving, setIsSaving] = useState(false);
+  const router = useRouter();
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -239,12 +242,34 @@ export function ContractEditor({
           <ArrowLeft className="h-4 w-4" />
           Volver a
         </Button>
-        <Link href="/dashboard">
-          <Button className="gap-2" onClick={() => onSubmit(editor.getHTML())}>
-            <Save className="h-4 w-4" />
-            Crear Contrato
-          </Button>
-        </Link>
+        <Button 
+          className="gap-2" 
+          onClick={async () => {
+            setIsSaving(true);
+            try {
+              const termsAndConditions = editor.getHTML();
+              const result = await createContract({
+                ...initialData,
+                termsAndConditions,
+              });
+              
+              if (result.success) {
+                toast.success(result.message);
+                router.push("/dashboard");
+              } else {
+                toast.error(result.error);
+              }
+            } catch (error) {
+              toast.error("Error al crear el contrato");
+            } finally {
+              setIsSaving(false);
+            }
+          }}
+          disabled={isSaving}
+        >
+          <Save className="h-4 w-4" />
+          {isSaving ? "Creando..." : "Crear Contrato"}
+        </Button>
       </div>
     </div>
   );

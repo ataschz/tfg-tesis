@@ -1,31 +1,35 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { ContractCard } from '@/components/unified/contract-card';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { ContractCard } from "@/components/unified/contract-card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Search } from 'lucide-react';
+} from "@/components/ui/select";
+import { Search } from "lucide-react";
 
 interface ContractListProps {
   contracts: any[];
-  type: 'received' | 'sent';
+  type: "received" | "sent";
 }
 
 export function ContractList({ contracts, type }: ContractListProps) {
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredContracts = contracts.filter((contract) => {
-    const matchesSearch = contract.title.toLowerCase().includes(search.toLowerCase()) ||
-      contract.description.toLowerCase().includes(search.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || contract.status === statusFilter;
+  const safeContracts = contracts || [];
+
+  const filteredContracts = safeContracts.filter((contract) => {
+    const matchesSearch =
+      contract?.title?.toLowerCase().includes(search.toLowerCase()) ||
+      contract?.description?.toLowerCase().includes(search.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || contract?.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -34,7 +38,7 @@ export function ContractList({ contracts, type }: ContractListProps) {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold">
-          {type === 'received' ? 'Contratos Recibidos' : 'Contratos Enviados'}
+          {type === "received" ? "Contratos Recibidos" : "Contratos Enviados"}
         </h2>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative">
@@ -46,19 +50,20 @@ export function ContractList({ contracts, type }: ContractListProps) {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <Select
-            value={statusFilter}
-            onValueChange={setStatusFilter}
-          >
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filtrar por estado" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos los estados</SelectItem>
-              <SelectItem value="active">Activos</SelectItem>
-              <SelectItem value="completed">Completados</SelectItem>
               <SelectItem value="draft">Borradores</SelectItem>
+              <SelectItem value="sent">Enviados</SelectItem>
+              <SelectItem value="accepted">Aceptados</SelectItem>
+              <SelectItem value="rejected">Rechazados</SelectItem>
+              <SelectItem value="in_progress">En Progreso</SelectItem>
+              <SelectItem value="completed">Completados</SelectItem>
               <SelectItem value="cancelled">Cancelados</SelectItem>
+              <SelectItem value="in_dispute">En Disputa</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -67,19 +72,15 @@ export function ContractList({ contracts, type }: ContractListProps) {
       {filteredContracts.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-center">
           <p className="text-muted-foreground">
-            {search || statusFilter !== 'all'
-              ? 'No se encontraron contratos con los filtros actuales'
-              : 'No hay contratos disponibles'}
+            {search || statusFilter !== "all"
+              ? "No se encontraron contratos con los filtros actuales"
+              : "No hay contratos disponibles"}
           </p>
         </div>
       ) : (
         <div className="grid gap-6">
           {filteredContracts.map((contract) => (
-            <ContractCard 
-              key={contract.id} 
-              contract={contract}
-              type={type}
-            />
+            <ContractCard key={contract.id} contract={contract} type={type} />
           ))}
         </div>
       )}

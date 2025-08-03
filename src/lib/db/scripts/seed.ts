@@ -26,17 +26,17 @@ const runSeed = async () => {
   try {
     // Execute the SQL
     await connection.unsafe(sql);
-    
+
     const end = Date.now();
     console.log("✅ Seed completed in", end - start, "ms");
-    
+
     console.log("\n📊 Data seeded:");
-    console.log("- 1 usuario existente (conservado)");
-    console.log("- 3 contratistas nuevos");
-    console.log("- 3 contratantes nuevos");
+    console.log("- 4 contratistas");
+    console.log("- 3 contratantes");
     console.log("- 5 contratos con diferentes estados");
     console.log("- Milestones, pagos, reviews y disputas");
     console.log("- Notificaciones y suscripciones");
+    console.log("- Base de datos poblada desde cero");
   } catch (error) {
     console.error("❌ Seed failed:", error);
     throw error;

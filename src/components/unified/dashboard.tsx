@@ -1,11 +1,7 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { getUnifiedDashboardData } from "@/lib/actions/unified";
 import { ContractList } from "@/components/unified/contract-list";
 import { UnifiedStats } from "@/components/unified/unified-stats";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DashboardSkeleton } from "@/components/unified/dashboard-skeleton";
 import { FileText, Send } from "lucide-react";
 
 interface UnifiedData {
@@ -13,52 +9,65 @@ interface UnifiedData {
   sentContracts: any[];
   stats: {
     totalActiveContracts: number;
-    totalPendingAmount: number;
-    totalEscrowAmount: number;
-    totalEarnedThisMonth: number;
+    totalInProgressAmount: number; // En progreso + Aceptados
+    totalAvailableAmount: number; // Contratos completados
+    totalInDisputeAmount: number;
+    totalInDisputeContracts: number;
     currency: string;
+    userName: string;
   };
 }
 
-export function UnifiedDashboard() {
-  const [data, setData] = useState<UnifiedData | null>(null);
-  const [loading, setLoading] = useState(true);
+export async function UnifiedDashboard() {
+  let data: UnifiedData;
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const dashboardData = await getUnifiedDashboardData();
-        
-        const unifiedData: UnifiedData = {
-          receivedContracts: dashboardData.contractorData.contracts,
-          sentContracts: dashboardData.companyData.contracts,
-          stats: {
-            totalActiveContracts: 
-              dashboardData.contractorData.contracts.filter((c: any) => c.status === 'active').length +
-              dashboardData.companyData.contracts.filter((c: any) => c.status === 'active').length,
-            totalPendingAmount: dashboardData.contractorData.stats.escrowAmount + dashboardData.companyData.stats.upcomingPayments,
-            totalEscrowAmount: dashboardData.companyData.stats.escrowAmount,
-            totalEarnedThisMonth: dashboardData.contractorData.stats.totalEarnings,
-            currency: dashboardData.contractorData.stats.currency || dashboardData.companyData.stats.currency,
-          },
-        };
+  try {
+    const dashboardData = await getUnifiedDashboardData();
 
-        setData(unifiedData);
-      } catch (error) {
-        console.error("Error loading dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
+    const receivedContracts = dashboardData.contractorData?.contracts || [];
+    const sentContracts = dashboardData.companyData?.contracts || [];
+    const allContracts = [...receivedContracts, ...sentContracts];
 
-    loadData();
-  }, []);
+    // Calculate real statistics
+    const activeContracts = allContracts.filter((c: any) => 
+      c.status === "in_progress" || c.status === "accepted"
+    );
+    
+    const completedContracts = allContracts.filter((c: any) => 
+      c.status === "completed"
+    );
+    
+    const disputeContracts = allContracts.filter((c: any) => 
+      c.status === "in_dispute"
+    );
+    
+    const inProgressAmount = activeContracts.reduce((sum: number, contract: any) => 
+      sum + Number(contract.amount), 0
+    );
+    
+    const availableAmount = completedContracts.reduce((sum: number, contract: any) => 
+      sum + Number(contract.amount), 0
+    );
+    
+    const disputeAmount = disputeContracts.reduce((sum: number, contract: any) => 
+      sum + Number(contract.amount), 0
+    );
 
-  if (loading) {
-    return <DashboardSkeleton />;
-  }
-
-  if (!data) {
+    data = {
+      receivedContracts,
+      sentContracts,
+      stats: {
+        totalActiveContracts: activeContracts.length,
+        totalInProgressAmount: inProgressAmount,
+        totalAvailableAmount: availableAmount,
+        totalInDisputeAmount: disputeAmount,
+        totalInDisputeContracts: disputeContracts.length,
+        currency: dashboardData.userProfile?.preferredCurrency || "USD",
+        userName: `${dashboardData.userProfile?.firstName || ''} ${dashboardData.userProfile?.lastName || ''}`.trim(),
+      },
+    };
+  } catch (error) {
+    console.error("Error loading dashboard data:", error);
     return <div>Error al cargar los datos</div>;
   }
 
@@ -79,17 +88,11 @@ export function UnifiedDashboard() {
         </TabsList>
 
         <TabsContent value="received">
-          <ContractList 
-            contracts={data.receivedContracts}
-            type="received"
-          />
+          <ContractList contracts={data.receivedContracts} type="received" />
         </TabsContent>
 
         <TabsContent value="sent">
-          <ContractList 
-            contracts={data.sentContracts}
-            type="sent"
-          />
+          <ContractList contracts={data.sentContracts} type="sent" />
         </TabsContent>
       </Tabs>
     </div>

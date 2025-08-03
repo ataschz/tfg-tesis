@@ -135,6 +135,12 @@ export async function getUnifiedDashboardData() {
 
     return {
       userType: user.userType,
+      userProfile: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.userId,
+        preferredCurrency: user.preferredCurrency,
+      },
       contractorData: contractorData || {
         contracts: [],
         stats: { totalEarnings: 0, escrowAmount: 0, activeContracts: 0, completedContracts: 0, currency: "USD" }

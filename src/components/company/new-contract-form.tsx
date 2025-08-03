@@ -41,13 +41,63 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 interface NewContractFormProps {
+  contractors: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    contractorProfile?: {
+      skills: string[];
+      hourlyRate: string;
+      bio: string;
+    } | null;
+  }>;
+  clients: Array<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    clientProfile?: {
+      companyName: string;
+      companyDescription: string;
+      industry: string;
+    } | null;
+  }>;
+  currentUserId?: string;
+  currentUserType?: "client" | "contractor";
   onGenerate: (data: FormData) => void;
 }
 
-export function NewContractForm({ onGenerate }: NewContractFormProps) {
+export function NewContractForm({ 
+  contractors, 
+  clients, 
+  currentUserId, 
+  currentUserType, 
+  onGenerate 
+}: NewContractFormProps) {
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
+
+  // Get default selections based on current user
+  const getDefaultSelections = () => {
+    const defaults = {
+      contractors: [] as string[],
+      companies: [] as string[],
+    };
+
+    if (currentUserId && currentUserType) {
+      if (currentUserType === "contractor") {
+        defaults.contractors = [currentUserId];
+      } else if (currentUserType === "client") {
+        defaults.companies = [currentUserId];
+      }
+    }
+
+    return defaults;
+  };
+
+  const defaultSelections = getDefaultSelections();
 
   const methods = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -56,16 +106,29 @@ export function NewContractForm({ onGenerate }: NewContractFormProps) {
       description: "",
       amount: "",
       currency: "USD",
-      contractors: [],
-      companies: [],
+      contractors: defaultSelections.contractors,
+      companies: defaultSelections.companies,
       deliverables: [],
     },
   });
 
   const generateContract = async () => {
     const values = methods.getValues();
+    
+    // Validate required fields
     if (!values.title || !values.description || deliverables.length === 0) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+
+    // Validate participants
+    if (values.contractors.length === 0) {
+      toast.error("Debe seleccionar al menos un contratista");
+      return;
+    }
+
+    if (values.companies.length === 0) {
+      toast.error("Debe seleccionar al menos una empresa");
       return;
     }
 
@@ -114,7 +177,10 @@ export function NewContractForm({ onGenerate }: NewContractFormProps) {
 
         <div className="hidden lg:block">
           <div className="sticky top-24">
-            <ContractParticipants />
+            <ContractParticipants 
+              contractors={contractors}
+              clients={clients}
+            />
           </div>
         </div>
       </div>

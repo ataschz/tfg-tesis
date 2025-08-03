@@ -66,11 +66,13 @@ export function ContractorDashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <BalanceCard balance={{
-          available: data.stats.totalEarnings - data.stats.escrowAmount,
-          pending: data.stats.escrowAmount,
-          currency: data.stats.currency
-        }} />
+        <BalanceCard
+          balance={{
+            available: data.stats.totalEarnings - data.stats.escrowAmount,
+            pending: data.stats.escrowAmount,
+            currency: data.stats.currency,
+          }}
+        />
       </div>
 
       <ContractList contracts={data.contracts} />

@@ -14,6 +14,9 @@ if (!connectionString) {
 
 export const client = postgres(connectionString, {
   prepare: false,
+  max: 10, // Límite máximo de conexiones
+  idle_timeout: 20, // Tiempo de espera en segundos
+  connect_timeout: 10, // Tiempo límite de conexión
   types: {
     timestamp: {
       to: 1114,
