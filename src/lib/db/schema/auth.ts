@@ -27,6 +27,7 @@ export const user = pgTable(
     banned: boolean("banned").default(false),
     banReason: text("ban_reason"),
     banExpires: timestamp("ban_expires", { withTimezone: true }),
+    walletAddress: text("wallet_address"),
   },
   (table) => ({
     emailIdx: index("user_email_idx").on(table.email),

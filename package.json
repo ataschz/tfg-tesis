@@ -18,7 +18,11 @@
     "db:backup": "supabase db dump --file backup.sql",
     "db:restore": "psql \"postgresql://postgres:postgres@127.0.0.1:54322/postgres\" -f backup.sql",
     "db:sync": "pnpm run db:backup && pnpm run db:restore",
-    "db:sync-fresh": "supabase db reset && pnpm run db:restore"
+    "db:sync-fresh": "supabase db reset && pnpm run db:restore",
+    "blockchain:node": "npx hardhat node",
+    "blockchain:compile": "npx hardhat compile",
+    "blockchain:deploy": "npx hardhat run blockchain/scripts/deploy-and-setup.js --network localhost",
+    "blockchain:clean": "npx hardhat clean"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -72,6 +76,7 @@
     "embla-carousel-react": "^8.3.1",
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.1",
+    "ethers": "^6.15.0",
     "html2canvas": "^1.4.1",
     "input-otp": "^1.4.1",
     "jspdf": "^3.0.1",
@@ -102,6 +107,8 @@
   },
   "packageManager": "pnpm@9.12.3+sha512.cce0f9de9c5a7c95bef944169cc5dfe8741abfb145078c0d508b868056848a87c81e626246cb60967cbd7fd29a6c062ef73ff840d96b3c86c40ac92cf4a813ee",
   "devDependencies": {
-    "drizzle-kit": "^0.31.4"
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "drizzle-kit": "^0.31.4",
+    "hardhat": "^2.26.1"
   }
 }

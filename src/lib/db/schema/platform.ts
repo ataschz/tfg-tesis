@@ -24,6 +24,8 @@ export const userTypeEnum = pgEnum("user_type", [
 
 export const contractStatusEnum = pgEnum("contract_status", [
   "sent",
+  "awaiting_deposit",
+  "pending_acceptance",
   "accepted",
   "rejected",
   "in_progress",
@@ -248,6 +250,7 @@ export const contracts = pgTable(
     deliverables: text("deliverables").array(),
     termsAndConditions: text("terms_and_conditions"),
     status: contractStatusEnum("status").notNull().default("sent"),
+    blockchainContractId: text("blockchain_contract_id"),
     acceptedAt: timestamp("accepted_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),

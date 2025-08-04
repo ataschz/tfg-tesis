@@ -87,3 +87,110 @@ This is an escrow platform for contractor-client relationships with:
 - `DATABASE_URL` - PostgreSQL connection string
 - Better Auth configuration in `src/lib/auth.ts`
 - Supabase integration for additional services
+
+## Blockchain Integration ⛓️
+
+### Smart Contract EscrowManager
+- **Un solo contrato** gestiona múltiples escrows independientes
+- **Mapping de contractId** a datos de escrow individuales
+- **Administrador único** para todos los contratos
+
+### Roles:
+- **Buyer**: Contratante que deposita fondos ETH
+- **Seller**: Contratista que recibe pagos
+- **Administrator**: Gestiona disputas y controla flujos de todos los contratos
+
+### Estados por contrato:
+- `AWAITING_PAYMENT`: Esperando depósito inicial
+- `AWAITING_DELIVERY`: Fondos depositados, trabajo en progreso
+- `COMPLETE`: Contrato completado
+- `DISPUTED`: En disputa, requiere intervención
+
+### Funciones principales:
+- `createEscrow(contractId, buyer, seller, endDate, description)`: Crear nuevo escrow
+- `deposit(contractId)`: Buyer deposita fondos ETH
+- `releaseFunds(contractId)`: Buyer libera pago voluntariamente  
+- `refundToBuyer(contractId)`: Admin devuelve fondos al buyer
+- `releaseToSeller(contractId)`: Admin libera fondos al seller
+- `setDisputed(contractId)`: Marcar contrato en disputa
+- `resolveDispute(contractId, favorBuyer)`: Admin resuelve disputa
+- `getContractInfo(contractId)`: Información completa del escrow específico
+
+## Scripts de Desarrollo
+
+### Blockchain:
+```bash
+pnpm blockchain:node          # Iniciar blockchain local
+pnpm blockchain:compile       # Compilar contratos
+pnpm blockchain:deploy        # Desplegar EscrowManager
+pnpm blockchain:clean         # Limpiar artifacts
+# Deployment específico:
+npx hardhat run blockchain/scripts/deploy-and-setup.js --network localhost
+```
+
+## Flujo de Usuario Implementado ✅
+
+### 1. Creación de Contrato:
+1. Usuario crea contrato en DB (estado: 'sent')
+2. Sistema redirige a página de depósito `/new/deposit/[contractId]`
+3. Sistema despliega escrow en blockchain vía `initializeBlockchainContract()`
+4. Muestra instrucciones de depósito al buyer (dirección + monto ETH)
+5. Estado cambia a 'awaiting_deposit'
+
+### 2. Depósito ETH:
+1. Buyer transfiere ETH manualmente al EscrowManager contract
+2. Buyer presiona "Verificar Depósito" en la UI
+3. Sistema detecta depósito via API `/api/contracts/[id]/check-deposit`
+4. Estado cambia automáticamente a 'pending_acceptance'
+5. Seller recibe notificación para aceptar/rechazar
+
+### 3. Aceptación del Seller:
+1. Seller accede a página `/accept/[contractId]`
+2. Ve detalles completos del contrato
+3. Ingresa su wallet address para recibir pagos
+4. **Acepta**: API `/api/contracts/[id]/accept` → estado 'accepted' 
+5. **Rechaza**: API `/api/contracts/[id]/reject` → `refundToBuyer()` → estado 'rejected'
+
+### 4. Gestión Activa de Contratos:
+- **Buyer**: `/api/contracts/[id]/release-funds` → `releaseFunds()` → paga al seller
+- **Participantes**: `/api/contracts/[id]/dispute` → `setDisputed()` → estado 'in_dispute'
+- **Admin**: `/api/contracts/[id]/resolve-dispute` → `resolveDispute(favorBuyer)` → libera a winner
+
+### 5. Estados del Contrato:
+- `sent` → `awaiting_deposit` → `pending_acceptance` → `accepted` → `completed`
+- Alternativos: `rejected`, `cancelled`, `in_dispute`
+
+## Archivos Implementados ✅
+
+### Backend/Blockchain:
+- `src/lib/blockchain.ts` - Servicio de integración con EscrowManager
+- `src/lib/actions/contracts.ts` - Actions con `initializeBlockchainContract()`
+- `blockchain/contracts/EscrowManager.sol` - Smart contract multi-escrow
+- `blockchain/scripts/deploy-and-setup.js` - Deploy automatizado
+
+### Frontend:
+- `src/app/(app)/new/deposit/[contractId]/page.tsx` - Página de depósito
+- `src/app/(app)/accept/[contractId]/page.tsx` - Página de aceptación seller
+
+### APIs:
+- `src/app/api/contracts/[contractId]/check-deposit/route.ts`
+- `src/app/api/contracts/[contractId]/accept/route.ts`
+- `src/app/api/contracts/[contractId]/reject/route.ts`
+- `src/app/api/contracts/[contractId]/release-funds/route.ts`
+- `src/app/api/contracts/[contractId]/dispute/route.ts`
+- `src/app/api/contracts/[contractId]/resolve-dispute/route.ts`
+
+### Schema Updates:
+- `src/lib/db/schema/auth.ts` - Campo `walletAddress` en users
+- `src/lib/db/schema/platform.ts` - Estados blockchain + `blockchainContractId`
+
+## Setup Instructions
+
+1. **Configurar Database**: Actualizar `DATABASE_URL` en `.env.local`
+2. **Aplicar Schema**: `pnpm db:push`
+3. **Iniciar Blockchain**: `pnpm blockchain:node` (en terminal separada)
+4. **Deploy Contract**: `npx hardhat run blockchain/scripts/deploy-and-setup.js --network localhost`
+5. **Configurar .env.local**: Copiar address del contrato desplegado
+6. **Start App**: `pnpm dev`
+
+**El sistema está listo para usar ETH nativo con flujo completo de depósito y aceptación!** 🚀

@@ -9,9 +9,12 @@ import {
   type NewContractClient,
   type NewContractContractor
 } from "@/lib/db/schema/platform";
+import { user } from "@/lib/db/schema/auth";
+import { blockchainService } from "@/lib/blockchain";
 import { requireAuth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
 
 export async function createContract(formData: {
   title: string;
@@ -92,6 +95,7 @@ export async function createContract(formData: {
       success: true,
       contractId: result.id,
       message: "Contrato creado exitosamente",
+      redirectTo: `/new/deposit/${result.id}`,
     };
 
   } catch (error) {
@@ -99,6 +103,101 @@ export async function createContract(formData: {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Error al crear el contrato",
+    };
+  }
+}
+
+export async function initializeBlockchainContract(contractId: string) {
+  try {
+    const currentUser = await requireAuth();
+
+    // Buscar el contrato en la DB
+    const [contract] = await db
+      .select()
+      .from(contracts)
+      .where(eq(contracts.id, contractId));
+
+    if (!contract) {
+      return {
+        success: false,
+        error: 'Contrato no encontrado',
+      };
+    }
+
+    // Verificar que el usuario actual sea el creator del contrato
+    if (contract.clientId !== currentUser.profile.id) {
+      return {
+        success: false,
+        error: 'No tienes permisos para inicializar este contrato',
+      };
+    }
+
+    // Obtener los datos del buyer (client) y seller (contractor)
+    const [buyerData] = await db
+      .select({
+        walletAddress: user.walletAddress,
+      })
+      .from(user)
+      .where(eq(user.id, currentUser.id));
+
+    const [sellerData] = await db
+      .select({
+        walletAddress: user.walletAddress,
+      })
+      .from(user)
+      .innerJoin(contractContractors, eq(user.id, contractContractors.contractorId))
+      .where(eq(contractContractors.contractId, contractId))
+      .limit(1);
+
+    if (!buyerData?.walletAddress) {
+      return {
+        success: false,
+        error: 'Debes configurar tu wallet address en tu perfil antes de crear el contrato',
+      };
+    }
+
+    if (!sellerData?.walletAddress) {
+      return {
+        success: false,
+        error: 'El contractor debe tener una wallet address configurada',
+      };
+    }
+
+    // Crear el contrato en blockchain
+    const endDate = contract.endDate ? new Date(contract.endDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 días por defecto
+    
+    await blockchainService.createEscrow(
+      contractId,
+      buyerData.walletAddress,
+      sellerData.walletAddress,
+      endDate,
+      contract.description || contract.title
+    );
+
+    // Actualizar el estado del contrato en DB
+    await db
+      .update(contracts)
+      .set({
+        status: 'awaiting_deposit',
+        blockchainContractId: contractId,
+        updatedAt: new Date(),
+      })
+      .where(eq(contracts.id, contractId));
+
+    revalidatePath('/dashboard');
+
+    return {
+      success: true,
+      contractId,
+      escrowManagerAddress: blockchainService.getEscrowManagerAddress(),
+      totalAmount: contract.amount,
+      message: 'Contrato blockchain creado exitosamente',
+    };
+  } catch (error) {
+    console.error('Error initializing blockchain contract:', error);
+    return {
+      success: false,
+      error: 'Error al crear el contrato en blockchain',
     };
   }
 }

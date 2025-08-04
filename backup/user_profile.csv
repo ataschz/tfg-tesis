@@ -1,0 +1,4 @@
+id,user_id,first_name,last_name,phone,country,user_type,preferred_currency,created_at,updated_at,active
+1ee18b9f-b288-4713-aef3-b3b77a9f5e20,89d0912b-5cbe-4786-9230-545e062d81c5,Ata,Mediador,,,mediator,USD,2025-08-04 20:13:59.557868+00,2025-08-04 20:13:59.557868+00,true
+43511029-86ee-495d-9242-85e850fde3e6,1290d7d5-4ddb-442a-bbc2-41ee1cb83756,Ata,Freelancer,,,contractor,USD,2025-08-04 20:13:21.667486+00,2025-08-04 20:13:21.667486+00,true
+e8d6169f-9058-40f1-9321-2a075d0a3bd5,73b0645e-7cfe-4a34-a9c7-44d4dc711783,Ata,Empresa,,,client,USD,2025-08-04 20:13:37.972259+00,2025-08-04 20:13:37.972259+00,true

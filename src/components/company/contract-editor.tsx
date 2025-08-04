@@ -279,7 +279,11 @@ export function ContractEditor({ initialData, onBack }: ContractEditorProps) {
 
               if (result.success) {
                 toast.success(result.message);
-                router.push("/dashboard");
+                if (result.redirectTo) {
+                  router.push(result.redirectTo);
+                } else {
+                  router.push("/dashboard");
+                }
               } else {
                 toast.error(result.error);
               }
