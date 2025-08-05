@@ -45,7 +45,7 @@ export async function POST(
 
     if (!clientRecord) {
       return NextResponse.json(
-        { success: false, error: 'Solo el cliente puede liberar los fondos' },
+        { success: false, error: 'Solo la empresa puede liberar los fondos' },
         { status: 403 }
       );
     }
@@ -74,7 +74,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: 'Fondos liberados exitosamente al contractor. El contrato ha sido completado.',
+      message: 'Fondos liberados exitosamente al freelancer. El contrato ha sido completado.',
     });
 
   } catch (error) {

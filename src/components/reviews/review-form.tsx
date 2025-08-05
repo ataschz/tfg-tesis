@@ -88,7 +88,7 @@ export function ReviewForm({
   };
 
   const userTypeLabel =
-    reviewedUserType === "contractor" ? "contratista" : "cliente";
+    reviewedUserType === "contractor" ? "freelancer" : "empresa";
 
   return (
     <Card className="p-6">

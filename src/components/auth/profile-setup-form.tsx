@@ -39,10 +39,10 @@ const baseSchema = z.object({
   lastName: z.string().min(1, "El apellido es requerido"),
   phone: z.string().optional(),
   country: z.string().optional(),
-  preferredCurrency: z.string().default("USD"),
+  preferredCurrency: z.string().default("ETH"),
 });
 
-// Esquema para contratistas
+// Esquema para freelancers
 const contractorSchema = baseSchema.extend({
   username: z.string().optional(),
   specialties: z.string().optional(),
@@ -57,7 +57,7 @@ const contractorSchema = baseSchema.extend({
   timezone: z.string().optional(),
 });
 
-// Esquema para clientes
+// Esquema para empresas
 const clientSchema = baseSchema.extend({
   company: z.string().optional(),
   industry: z.string().optional(),
@@ -112,7 +112,7 @@ export function ProfileSetupForm({ user, userType }: ProfileSetupFormProps) {
       lastName: user.name?.split(" ").slice(1).join(" ") || "",
       phone: "",
       country: "",
-      preferredCurrency: "USD",
+      preferredCurrency: "ETH",
       // Campos específicos según tipo de usuario
       ...(userType === "contractor" && {
         availability: "unavailable" as const,
@@ -307,11 +307,11 @@ export function ProfileSetupForm({ user, userType }: ProfileSetupFormProps) {
                   ? "Puedes ofrecer tus servicios y trabajar en proyectos"
                   : userType === "client"
                   ? "Puedes contratar profesionales para tus proyectos"
-                  : "Puedes mediar en disputas entre clientes y contratistas"}
+                  : "Puedes mediar en disputas entre empresas y freelancers"}
               </p>
             </div>
 
-            {/* Campos específicos para contratistas */}
+            {/* Campos específicos para freelancers */}
             {userType === "contractor" && (
               <div className="space-y-4 border-t pt-6">
                 <h3 className="text-lg font-medium">
@@ -480,7 +480,7 @@ export function ProfileSetupForm({ user, userType }: ProfileSetupFormProps) {
               </div>
             )}
 
-            {/* Campos específicos para clientes */}
+            {/* Campos específicos para empresas */}
             {userType === "client" && (
               <div className="space-y-4 border-t pt-6">
                 <h3 className="text-lg font-medium">Información de Empresa</h3>

@@ -57,7 +57,7 @@ export async function POST(
       } catch (blockchainError) {
         console.error('Error refunding to buyer:', blockchainError);
         return NextResponse.json(
-          { success: false, error: 'Error al devolver los fondos al cliente' },
+          { success: false, error: 'Error al devolver los fondos a la empresa' },
           { status: 500 }
         );
       }
@@ -74,7 +74,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: 'Contrato rechazado exitosamente. Los fondos han sido devueltos al cliente.',
+      message: 'Contrato rechazado exitosamente. Los fondos han sido devueltos a la empresa.',
     });
 
   } catch (error) {

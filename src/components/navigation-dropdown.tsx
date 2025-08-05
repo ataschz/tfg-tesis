@@ -23,9 +23,10 @@ interface User {
 
 interface NavigationDropdownProps {
   user: User;
+  userRole?: string | null;
 }
 
-export function NavigationDropdown({ user }: NavigationDropdownProps) {
+export function NavigationDropdown({ user, userRole }: NavigationDropdownProps) {
   const handleSignOut = async () => {
     await authClient.signOut();
     redirect("/");
@@ -48,6 +49,11 @@ export function NavigationDropdown({ user }: NavigationDropdownProps) {
         <DropdownMenuItem asChild>
           <Link href="/dashboard">Dashboard</Link>
         </DropdownMenuItem>
+        {userRole === 'client' && (
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/contract/new">Crear Contrato</Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
           <Link href="/profile">Perfil</Link>
         </DropdownMenuItem>

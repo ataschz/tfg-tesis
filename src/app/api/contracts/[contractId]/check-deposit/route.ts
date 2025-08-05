@@ -7,16 +7,17 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { contractId: string } }
+  { params }: { params: Promise<{ contractId: string }> }
 ) {
   try {
     await requireAuth();
+    const { contractId } = await params;
 
     // Buscar el contrato en la DB
     const [contract] = await db
       .select()
       .from(contracts)
-      .where(eq(contracts.id, params.contractId));
+      .where(eq(contracts.id, contractId));
 
     if (!contract) {
       return NextResponse.json(
@@ -43,7 +44,7 @@ export async function GET(
           status: 'pending_acceptance',
           updatedAt: new Date(),
         })
-        .where(eq(contracts.id, params.contractId));
+        .where(eq(contracts.id, contractId));
 
       return NextResponse.json({
         success: true,

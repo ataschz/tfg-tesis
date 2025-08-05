@@ -1,0 +1,187 @@
+  console.log("✅ Depósito realizado exitosamente!");
+  await contract.deposit(contractId, { value: ethers.parseEther("5") });
+  // Realizar el depósito (ajusta el monto según tu contrato)
+  ], buyerSigner);
+    'function deposit(string contractId) payable'
+  const contract = new ethers.Contract(contractAddress, [
+  // Crear instancia del contrato con la cuenta correcta
+  const contractId = "1432d91c-3b8b-4b68-a2af-07dcd5b5995e"; // Tu nuevo contrato
+  const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  // Configuración del contrato
+  console.log("Usando cuenta:", buyerSigner.address);
+  const [buyerSigner] = await ethers.getSigners();
+// Usar Account 0 (cliente con wallet address corregida)
+  await contract.deposit(contractId, { value: ethers.parseEther("0.5") });
+  // Realizar el depósito (ajusta el monto según tu contrato)
+  ], buyerSigner);
+    'function deposit(string contractId) payable'
+  const contract = new ethers.Contract(contractAddress, [
+  // Crear instancia del contrato con la cuenta correcta
+  const contractId = "1432d91c-3b8b-4b68-a2af-07dcd5b5995e"; // Tu nuevo contrato
+  const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  // Configuración del contrato
+  console.log("Usando cuenta:", buyerSigner.address);
+  const [buyerSigner] = await ethers.getSigners();
+// Usar Account 0 (cliente con wallet address corregida)
+  await contract.deposit(contractId, { value: ethers.parseEther("0.5") });
+  // Realizar el depósito (ajusta el monto según tu contrato)
+  ], buyerSigner);
+    'function deposit(string contractId) payable'
+  const contract = new ethers.Contract(contractAddress, [
+  // Crear instancia del contrato con la cuenta correcta
+  const contractId = "1432d91c-3b8b-4b68-a2af-07dcd5b5995e"; // Tu nuevo contrato
+  const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  // Configuración del contrato
+  console.log("Usando cuenta:", buyerSigner.address);
+const [buyerSigner] = await ethers.getSigners();
+  console.log("✅ Depósito realizado exitosamente!");
+  await contract.deposit(contractId, { value: ethers.parseEther("0.5") });
+  // Realizar el depósito (ajusta el monto según tu contrato)
+  ], buyerSigner);
+    'function deposit(string contractId) payable'
+  const contract = new ethers.Contract(contractAddress, [
+  // Crear instancia del contrato con la cuenta correcta
+  const contractId = "1432d91c-3b8b-4b68-a2af-07dcd5b5995e"; // Tu nuevo contrato
+  const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  // Configuración del contrato
+  console.log("Usando cuenta:", buyerSigner.address);
+const [buyerSigner] = await ethers.getSigners();
+  signers[0].address.toLowerCase());
+  console.log("¿Coinciden?", targetBuyer.toLowerCase() ===
+  console.log("Account 0 (esperado):", signers[0].address);
+  console.log("Buyer en blockchain:", targetBuyer);
+const targetBuyer = "0x70Bc4A596a8edD993D9A08e62413A792D289BD1E";
+  });
+    console.log(`Account ${index}: ${signer.address}`);
+  signers.forEach((signer, index) => {
+  const signers = await ethers.getSigners();
+// Paso 1: Obtener todas las cuentas
+  }
+    console.log("❌ Buyer no encontrado en las cuentas disponibles");
+  } else {
+    console.log("✅ Depósito realizado con la cuenta correcta!");
+    await contract.deposit(contractId, { value: ethers.parseEther("0.5") });
+    ], buyerSigner);
+      'function deposit(string contractId) payable'
+    const contract = new ethers.Contract(contractAddress, [
+    const contractId = "83a71c4c-d3e9-4eba-a899-fd7b5fc0e855";
+    const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+    // Hacer el depósito con la cuenta correcta
+    console.log("✅ Buyer encontrado en account:", signers.indexOf(buyerSigner));
+  if (buyerSigner) {
+  targetBuyer.toLowerCase());
+  const buyerSigner = signers.find(s => s.address.toLowerCase() ===
+  const targetBuyer = "0x70Bc4A596a8edD993D9A08e62413A792D289BD1E";
+  // Buscar qué cuenta tiene esa dirección
+  // El buyer registrado en el contrato es: 0x70Bc4A596a8edA993D9A08e62413A792D289BD1E
+  });
+    console.log(`Account ${index}: ${signer.address}`);
+  signers.forEach((signer, index) => {
+  const signers = await ethers.getSigners();
+// Obtener todas las cuentas
+  }
+    console.log("❌ Buyer no encontrado en las cuentas disponibles");
+  } else {
+    console.log("✅ Depósito realizado con la cuenta correcta!");
+    await contract.deposit(contractId, { value: ethers.parseEther("0.5") });
+    ], buyerSigner);
+      'function deposit(string contractId) payable'
+    const contract = new ethers.Contract(contractAddress, [
+    const contractId = "83a71c4c-d3e9-4eba-a899-fd7b5fc0e855";
+    const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+    // Hacer el depósito con la cuenta correcta
+    console.log("✅ Buyer encontrado en account:", signers.indexOf(buyerSigner));
+  if (buyerSigner) {
+  targetBuyer.toLowerCase());
+  const buyerSigner = signers.find(s => s.address.toLowerCase() ===
+  const targetBuyer = "0x70Bc4A596a8edD993D9A08e62413A792D289BD1E";
+  // Buscar qué cuenta tiene esa dirección
+  // El buyer registrado en el contrato es: 0x70Bc4A596a8edA993D9A08e62413A792D289BD1E
+  });
+    console.log(`Account ${index}: ${signer.address}`);
+  signers.forEach((signer, index) => {
+  const signers = await ethers.getSigners();
+// Obtener todas las cuentas
+  console.log("✅ Depósito realizado exitosamente!");
+  await contractWithBuyer.deposit(contractId, { value: ethers.parseEther("0.5") });
+  // Realizar el depósito (ajusta el monto según tu contrato)
+  ], buyerSigner);
+    'function deposit(string contractId) payable'
+  const contractWithBuyer = new ethers.Contract(contractAddress, [
+  const contractId = "83a71c4c-d3e9-4eba-a899-fd7b5fc0e855";
+  const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  // Crear contrato con la cuenta del buyer
+  console.log("Using buyer:", buyerSigner.address);
+  const buyerSigner = signers[0]; // Account #0
+const signers = await ethers.getSigners();
+  console.log("Your current address:", signer.address);
+  console.log("Buyer address:", info[0]);
+  const info = await contract.getContractInfo(contractId);
+  const contract = new ethers.Contract(contractAddress, EscrowManagerABI, signer);
+  const [signer] = await ethers.getSigners();
+  ];
+  address, uint256, uint256, uint256, string, uint8, bool)'
+    'function getContractInfo(string contractId) view returns (address, address, 
+  const EscrowManagerABI = [
+  const contractId = "83a71c4c-d3e9-4eba-a899-fd7b5fc0e855";
+const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  console.log("Your current address:", signer.address);
+  console.log("Buyer address:", info[0]);
+  const info = await contract.getContractInfo(contractId);
+  const contract = new ethers.Contract(contractAddress, EscrowManagerABI, signer);
+  const [signer] = await ethers.getSigners();
+  ];
+  address, uint256, uint256, uint256, string, uint8, bool)'
+    'function getContractInfo(string contractId) view returns (address, address, 
+  const EscrowManagerABI = [
+  const contractId = "83a71c4c-d3e9-4eba-a899-fd7b5fc0e855";
+const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  }
+    console.log("✅ Depósito realizado exitosamente!");
+    await contractWithBuyer.deposit(contractId, { value: ethers.parseEther("0.5") });
+    // Realizar el depósito
+    ], buyerSigner);
+      'function deposit(string contractId) payable'
+    const contractWithBuyer = new ethers.Contract(contractAddress, [
+    // Crear contrato con la cuenta correcta
+    console.log("✓ Buyer encontrado:", buyerSigner.address);
+  } else {
+  disponibles");
+    console.log("ERROR: No se encontró la cuenta del buyer en las cuentas 
+  if (!buyerSigner) {
+  buyerAddress.toLowerCase());
+  const buyerSigner = signers.find(s => s.address.toLowerCase() ===
+  const buyerAddress = info[0]; // Del paso anterior
+  // Buscar la cuenta que coincida con la dirección del buyer
+  });
+    console.log(`Account ${index}: ${signer.address}`);
+  signers.forEach((signer, index) => {
+  // Mostrar todas las direcciones disponibles
+  const signers = await ethers.getSigners();
+  // Obtener todas las cuentas disponibles
+  Una vez que sepas cuál es la dirección del buyer, usa esa cuenta específica:
+  2. Usar la cuenta correcta del buyer:
+  console.log("Your current address:", signer.address);
+  console.log("Buyer address:", info[0]);
+  const info = await contract.getContractInfo(contractId);
+  const contract = new ethers.Contract(contractAddress, EscrowManagerABI, signer);
+  const [signer] = await ethers.getSigners();
+  ];
+  address, uint256, uint256, uint256, string, uint8, bool)'
+    'function getContractInfo(string contractId) view returns (address, address, 
+  const EscrowManagerABI = [
+  const contractId = "83a71c4c-d3e9-4eba-a899-fd7b5fc0e855";
+const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  await contract.deposit(contractId, { value: ethers.parseEther("0.5") });
+  // Realizar el depósito (reemplaza "0.5" con el monto correcto)
+  const contract = new ethers.Contract(contractAddress, EscrowManagerABI, buyer);
+  ];
+    'function deposit(string contractId) payable'
+  const EscrowManagerABI = [
+  // Crear instancia del contrato
+  const contractId = "83a71c4c-d3e9-4eba-a899-fd7b5fc0e855";
+  const contractAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  // Obtener información de tu contrato desde la pantalla
+  const [buyer] = await ethers.getSigners();
+// Obtener la primera cuenta (buyer)
+const [buyer] = await ethers.getSigners();

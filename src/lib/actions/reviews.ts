@@ -109,7 +109,7 @@ export async function createReviewAction(params: CreateReviewActionParams) {
       return {
         success: false,
         error:
-          "Tipo de reseña inválido. Los clientes solo pueden revisar contratistas y viceversa",
+          "Tipo de reseña inválido. Las empresas solo pueden revisar freelancers y viceversa",
       };
     }
 

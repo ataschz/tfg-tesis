@@ -45,7 +45,7 @@ export async function getContractorData() {
       escrowAmount: contractStats.escrowAmount,
       activeContracts: contractStats.activeContracts,
       completedContracts: contractStats.completedContracts,
-      currency: user.preferredCurrency || "USD",
+      currency: user.preferredCurrency || "ETH",
     };
 
     // Transformar contratos para el frontend

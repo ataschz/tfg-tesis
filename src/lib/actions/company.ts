@@ -91,7 +91,7 @@ export async function getCompanyData() {
       escrowAmount: contractStats.escrowAmount,
       activeContracts: contractStats.activeContracts,
       upcomingPayments: contractStats.activeContracts, // Simplificado, podrías calcular pagos pendientes
-      currency: user.preferredCurrency || "USD",
+      currency: user.preferredCurrency || "ETH",
     };
 
     // Transformar contratos para el frontend

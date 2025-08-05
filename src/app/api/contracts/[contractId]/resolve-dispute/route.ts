@@ -71,8 +71,8 @@ export async function POST(
       })
       .where(eq(contracts.id, params.contractId));
 
-    const winner = favorBuyer ? 'cliente' : 'contractor';
-    const action = favorBuyer ? 'devueltos al cliente' : 'liberados al contractor';
+    const winner = favorBuyer ? 'empresa' : 'freelancer';
+    const action = favorBuyer ? 'devueltos a la empresa' : 'liberados al freelancer';
 
     return NextResponse.json({
       success: true,

@@ -67,7 +67,7 @@ export async function getUnifiedDashboardData() {
             escrowAmount: contractStats.escrowAmount,
             activeContracts: contractStats.activeContracts,
             completedContracts: contractStats.completedContracts,
-            currency: user.preferredCurrency || "USD",
+            currency: user.preferredCurrency || "ETH",
           },
           contracts,
           user: {
@@ -117,7 +117,7 @@ export async function getUnifiedDashboardData() {
             escrowAmount: contractStats.escrowAmount,
             activeContracts: contractStats.activeContracts,
             upcomingPayments: contractStats.activeContracts, // Simplified
-            currency: user.preferredCurrency || "USD",
+            currency: user.preferredCurrency || "ETH",
           },
           contracts,
           user: {
@@ -143,11 +143,11 @@ export async function getUnifiedDashboardData() {
       },
       contractorData: contractorData || {
         contracts: [],
-        stats: { totalEarnings: 0, escrowAmount: 0, activeContracts: 0, completedContracts: 0, currency: "USD" }
+        stats: { totalEarnings: 0, escrowAmount: 0, activeContracts: 0, completedContracts: 0, currency: "ETH" }
       },
       companyData: companyData || {
         contracts: [],
-        stats: { totalSpent: 0, escrowAmount: 0, activeContracts: 0, upcomingPayments: 0, currency: "USD" }
+        stats: { totalSpent: 0, escrowAmount: 0, activeContracts: 0, upcomingPayments: 0, currency: "ETH" }
       },
     };
   } catch (error) {

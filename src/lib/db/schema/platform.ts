@@ -132,7 +132,7 @@ export const userProfiles = pgTable(
     country: varchar("country", { length: 50 }),
     userType: userTypeEnum("user_type").notNull(),
     preferredCurrency: varchar("preferred_currency", { length: 3 }).default(
-      "USD"
+      "ETH"
     ),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
@@ -244,7 +244,7 @@ export const contracts = pgTable(
     title: varchar("title", { length: 200 }).notNull(),
     description: text("description").notNull(),
     amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
-    currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+    currency: varchar("currency", { length: 3 }).notNull().default("ETH"),
     startDate: date("start_date"),
     endDate: date("end_date"),
     deliverables: text("deliverables").array(),
@@ -329,7 +329,7 @@ export const milestones = pgTable(
     title: varchar("title", { length: 200 }).notNull(),
     description: text("description"),
     amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
-    currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+    currency: varchar("currency", { length: 3 }).notNull().default("ETH"),
     dueDate: date("due_date"),
     completedAt: timestamp("completed_at", { withTimezone: true }),
     status: varchar("status", { length: 20 }).notNull().default("pending"), // pending, completed, cancelled
@@ -519,7 +519,7 @@ export const accountBalances = pgTable(
     availableBalance: decimal("available_balance", { precision: 12, scale: 2 })
       .notNull()
       .default("0"),
-    currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+    currency: varchar("currency", { length: 3 }).notNull().default("ETH"),
     lastUpdated: timestamp("last_updated", { withTimezone: true }).defaultNow(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
@@ -540,7 +540,7 @@ export const accountTransactions = pgTable(
       .notNull(),
     type: accountTransactionTypeEnum("type").notNull(),
     amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
-    currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+    currency: varchar("currency", { length: 3 }).notNull().default("ETH"),
     status: accountTransactionStatusEnum("status").notNull().default("pending"),
     paymentMethod: paymentMethodEnum("payment_method"),
     transactionReference: varchar("transaction_reference", { length: 200 }),

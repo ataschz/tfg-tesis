@@ -1,4 +1,4 @@
 id,name,email,email_verified,image,created_at,updated_at,role,banned,ban_reason,ban_expires,wallet_address
 1290d7d5-4ddb-442a-bbc2-41ee1cb83756,Ata Freelancer,gahs94@gmail.com,false,,2025-08-04 20:13:20.712+00,2025-08-04 20:13:20.712+00,user,false,,,
 73b0645e-7cfe-4a34-a9c7-44d4dc711783,Ata Empresa,ata@retrip.io,false,,2025-08-04 20:13:37.267+00,2025-08-04 20:13:37.267+00,user,false,,,
-89d0912b-5cbe-4786-9230-545e062d81c5,Ata Mediador,ata@treto.com,false,,2025-08-04 20:13:58.824+00,2025-08-04 20:13:58.824+00,user,false,,,
+89d0912b-5cbe-4786-9230-545e062d81c5,Ata Mediador,ata@trato.com,false,,2025-08-04 20:13:58.824+00,2025-08-04 20:13:58.824+00,user,false,,,

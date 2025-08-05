@@ -35,6 +35,9 @@ import {
   Users2,
   AlertTriangle,
   Clock,
+  CheckCircle,
+  XCircle,
+  Banknote,
 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -42,6 +45,7 @@ import { useRouter } from "next/navigation";
 import { format, formatDistanceToNow, isFuture } from "date-fns";
 import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useMetaMask } from "@/hooks/useMetaMask";
 
 interface ContractCardProps {
   contract: any; // TODO: Add proper type
@@ -52,6 +56,9 @@ export function ContractCard({ contract, type }: ContractCardProps) {
   const router = useRouter();
   const [showDisputeDialog, setShowDisputeDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isReleasingFunds, setIsReleasingFunds] = useState(false);
+  
+  const metaMask = useMetaMask();
 
   const startDate = new Date(contract.startDate);
   const endDate = new Date(contract.endDate);
@@ -63,6 +70,16 @@ export function ContractCard({ contract, type }: ContractCardProps) {
         return {
           text: contractType === "sent" ? "Enviado" : "Recibido",
           badge: "bg-blue-500/10 text-blue-600",
+        };
+      case "awaiting_deposit":
+        return {
+          text: "Esperando Depósito",
+          badge: "bg-yellow-500/10 text-yellow-600",
+        };
+      case "pending_acceptance":
+        return {
+          text: "Pendiente de Aceptación",
+          badge: "bg-amber-500/10 text-amber-600",
         };
       case "accepted":
         return {
@@ -103,6 +120,51 @@ export function ContractCard({ contract, type }: ContractCardProps) {
   };
 
   const status = getStatusInfo(contract.status, type);
+
+  const handleReleaseFunds = async () => {
+    if (!contract.blockchainContractId) {
+      toast.error('Este contrato no tiene un ID de blockchain válido');
+      return;
+    }
+
+    setIsReleasingFunds(true);
+    try {
+      // First connect to MetaMask if not connected
+      if (!metaMask.isConnected) {
+        await metaMask.connect();
+        if (!metaMask.isConnected) {
+          toast.error('No se pudo conectar a MetaMask');
+          return;
+        }
+      }
+
+      toast.loading('Liberando fondos...');
+
+      // Get the escrow manager address from environment or contract data
+      const escrowManagerAddress = process.env.NEXT_PUBLIC_ESCROW_MANAGER_ADDRESS || '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
+
+      // Release the funds
+      const success = await metaMask.releaseFunds(
+        escrowManagerAddress,
+        contract.blockchainContractId
+      );
+
+      if (success) {
+        toast.success('¡Fondos liberados exitosamente! El contrato ha sido completado.');
+        
+        // Refresh the page to show updated status
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        toast.error(metaMask.error || 'Error al liberar los fondos');
+      }
+    } catch (error) {
+      toast.error('Error inesperado al procesar la liberación de fondos');
+    } finally {
+      setIsReleasingFunds(false);
+    }
+  };
 
 
   return (
@@ -272,6 +334,72 @@ export function ContractCard({ contract, type }: ContractCardProps) {
             </div>
           </div>
         </div>
+
+        {/* Action Buttons for Pending Acceptance */}
+        {type === "received" && contract.status === "pending_acceptance" && (
+          <div className="border-t border-border/50 bg-muted/20 p-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                Este contrato está esperando tu respuesta
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => router.push(`/accept/${contract.id}?action=reject`)}
+                  className="gap-2"
+                >
+                  <XCircle className="h-4 w-4" />
+                  Rechazar
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => router.push(`/accept/${contract.id}`)}
+                  className="gap-2"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Aceptar Contrato
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Buttons for Release Funds (Buyer) */}
+        {type === "sent" && (contract.status === "accepted" || contract.status === "in_progress") && (
+          <div className="border-t border-border/50 bg-green-50/50 p-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-muted-foreground">
+                ¿Estás satisfecho con el trabajo? Libera los fondos al freelancer
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={handleReleaseFunds}
+                  disabled={isReleasingFunds || !metaMask.isAvailable}
+                  className="gap-2"
+                >
+                  {isReleasingFunds ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                      Liberando...
+                    </>
+                  ) : (
+                    <>
+                      <Banknote className="h-4 w-4" />
+                      Liberar Fondos
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+            {metaMask.error && (
+              <div className="mt-2 text-sm text-red-600">
+                {metaMask.error}
+              </div>
+            )}
+          </div>
+        )}
       </Card>
 
 

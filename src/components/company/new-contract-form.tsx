@@ -19,7 +19,7 @@ const formSchema = z.object({
   amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
     message: "Amount must be a positive number",
   }),
-  currency: z.string().min(1, "Please select a currency"),
+  currency: z.string().default("ETH"),
   startDate: z.date({
     required_error: "Start date is required",
   }),
@@ -111,7 +111,7 @@ export function NewContractForm({
       title: "",
       description: "",
       amount: "",
-      currency: "USD",
+      currency: "ETH",
       contractors: defaultSelections.contractors,
       companies: defaultSelections.companies,
       deliverables: [],

@@ -31,7 +31,7 @@ export function DisputesFilters({
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar por contrato, empresa o contratista..."
+            placeholder="Buscar por contrato, empresa o freelancer..."
             className="pl-8"
           />
         </div>

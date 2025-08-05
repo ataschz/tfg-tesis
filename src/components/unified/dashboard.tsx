@@ -40,7 +40,7 @@ export async function UnifiedDashboard() {
     const userType = dashboardData.userType;
 
     if (userType === "client") {
-      // Para clientes: balance excluye completados y cancelados
+      // Para empresas: balance excluye completados y cancelados
       const balanceContracts = allContracts.filter(
         (c: any) =>
           c.status === "sent" ||
@@ -88,7 +88,7 @@ export async function UnifiedDashboard() {
         }`.trim(),
       };
     } else {
-      // Para contratistas: balance incluye trabajos activos, completados y en disputa
+      // Para freelancers: balance incluye trabajos activos, completados y en disputa
       const activeContracts = allContracts.filter(
         (c: any) => c.status === "accepted" || c.status === "in_progress"
       );
@@ -172,7 +172,7 @@ export async function UnifiedDashboard() {
         className="space-y-6"
       >
         <TabsList>
-          {/* Contratos Recibidos - Solo para contratistas y mediadores */}
+          {/* Contratos Recibidos - Solo para freelancers y mediadores */}
           {(data.userType === "contractor" || data.userType === "mediator") && (
             <TabsTrigger value="received" className="gap-2">
               <FileText className="h-4 w-4" />
@@ -180,7 +180,7 @@ export async function UnifiedDashboard() {
             </TabsTrigger>
           )}
 
-          {/* Contratos Enviados - Solo para clientes y mediadores */}
+          {/* Contratos Enviados - Solo para empresas y mediadores */}
           {(data.userType === "client" || data.userType === "mediator") && (
             <TabsTrigger value="sent" className="gap-2">
               <Send className="h-4 w-4" />

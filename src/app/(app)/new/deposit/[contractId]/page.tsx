@@ -9,6 +9,7 @@ import { Copy, ExternalLink, Wallet, AlertCircle, CheckCircle, Loader2 } from 'l
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useMetaMask } from '@/hooks/useMetaMask';
 
 interface DepositPageProps {
   params: { contractId: string };
@@ -25,7 +26,10 @@ export default function DepositPage({ params }: DepositPageProps) {
   const [contractData, setContractData] = useState<ContractData | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [isCheckingDeposit, setIsCheckingDeposit] = useState(false);
+  const [isDepositing, setIsDepositing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const metaMask = useMetaMask();
 
   const initializeContract = useCallback(async () => {
     setIsInitializing(true);
@@ -85,6 +89,46 @@ export default function DepositPage({ params }: DepositPageProps) {
       toast.error('Error al verificar el depósito');
     } finally {
       setIsCheckingDeposit(false);
+    }
+  };
+
+  const handleMetaMaskDeposit = async () => {
+    if (!contractData) return;
+
+    setIsDepositing(true);
+    try {
+      // First connect to MetaMask if not connected
+      if (!metaMask.isConnected) {
+        await metaMask.connect();
+        if (!metaMask.isConnected) {
+          toast.error('No se pudo conectar a MetaMask');
+          return;
+        }
+      }
+
+      toast.loading('Procesando depósito...');
+
+      // Make the deposit
+      const success = await metaMask.makeDeposit(
+        contractData.escrowManagerAddress,
+        contractData.contractId,
+        contractData.totalAmount
+      );
+
+      if (success) {
+        toast.success('¡Depósito realizado exitosamente!');
+        
+        // Wait a moment for the blockchain to process, then check
+        setTimeout(async () => {
+          await checkDeposit();
+        }, 2000);
+      } else {
+        toast.error(metaMask.error || 'Error al realizar el depósito');
+      }
+    } catch (error) {
+      toast.error('Error inesperado al procesar el depósito');
+    } finally {
+      setIsDepositing(false);
     }
   };
 
@@ -159,21 +203,92 @@ export default function DepositPage({ params }: DepositPageProps) {
         </Badge>
       </div>
 
-      {/* Instrucciones de depósito */}
+      {/* MetaMask Section */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            🦊 Depósito con MetaMask
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {!metaMask.isAvailable ? (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                MetaMask no está instalado. <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" className="underline">Instálalo aquí</a> para usar esta opción.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <div className="space-y-3">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-sm">
+                  <strong>Configuración necesaria:</strong>
+                  <br />• Red: Hardhat Local (http://127.0.0.1:8545, Chain ID: 1337)
+                  <br />• Wallet: Importar cuenta con private key de Hardhat
+                </AlertDescription>
+              </Alert>
+              
+              {metaMask.error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{metaMask.error}</AlertDescription>
+                </Alert>
+              )}
+              
+              <div className="text-sm text-muted-foreground">
+                {!metaMask.isConnected ? (
+                  <p>Conecta tu MetaMask para realizar el depósito automáticamente.</p>
+                ) : (
+                  <p>✅ Conectado: {metaMask.account?.slice(0, 6)}...{metaMask.account?.slice(-4)}</p>
+                )}
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleMetaMaskDeposit}
+                  disabled={isDepositing || metaMask.isConnecting}
+                  className="flex items-center gap-2"
+                  size="lg"
+                >
+                  {isDepositing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : metaMask.isConnecting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Wallet className="h-4 w-4" />
+                  )}
+                  {isDepositing ? 'Procesando...' : 
+                   metaMask.isConnecting ? 'Conectando...' :
+                   !metaMask.isConnected ? 'Conectar y Depositar' : 
+                   'Depositar con MetaMask'}
+                </Button>
+                
+                {metaMask.isConnected && (
+                  <Button variant="outline" onClick={metaMask.disconnect}>
+                    Desconectar
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Instrucciones de depósito manual */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wallet className="h-5 w-5" />
-            Instrucciones de Depósito
+            Depósito Manual (Alternativo)
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Para completar tu contrato, transfiere exactamente <strong>{contractData.totalAmount} ETH</strong> a la 
-              dirección del contrato usando tu wallet. Una vez confirmado el depósito, el contrato será enviado al 
-              contractor para su aceptación.
+              Si prefieres no usar MetaMask, puedes transferir manualmente <strong>{contractData.totalAmount} ETH</strong> a la 
+              dirección del contrato usando cualquier wallet. Luego usa "Verificar Depósito" para confirmar.
             </AlertDescription>
           </Alert>
 
@@ -241,11 +356,12 @@ export default function DepositPage({ params }: DepositPageProps) {
         </CardContent>
       </Card>
 
-      {/* Acciones */}
-      <div className="flex gap-4">
+      {/* Acciones adicionales */}
+      <div className="flex gap-4 flex-wrap">
         <Button 
           onClick={checkDeposit} 
           disabled={isCheckingDeposit}
+          variant="outline"
           className="flex items-center gap-2"
         >
           {isCheckingDeposit ? (
@@ -253,7 +369,7 @@ export default function DepositPage({ params }: DepositPageProps) {
           ) : (
             <CheckCircle className="h-4 w-4" />
           )}
-          {isCheckingDeposit ? 'Verificando...' : 'Verificar Depósito'}
+          {isCheckingDeposit ? 'Verificando...' : 'Verificar Depósito Manual'}
         </Button>
         
         <Button variant="outline" onClick={() => router.push('/dashboard')}>
@@ -266,7 +382,7 @@ export default function DepositPage({ params }: DepositPageProps) {
           className="flex items-center gap-2"
         >
           <ExternalLink className="h-4 w-4" />
-          Ver en Etherscan
+          Ver Contrato
         </Button>
       </div>
     </div>

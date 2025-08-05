@@ -43,7 +43,7 @@ export function ReviewDialog({
   };
 
   const defaultTriggerText = `Calificar ${
-    reviewedUserType === "contractor" ? "contratista" : "cliente"
+    reviewedUserType === "contractor" ? "freelancer" : "empresa"
   }`;
 
   return (

@@ -36,16 +36,19 @@ export function ContractList({ contracts, type }: ContractListProps) {
     ];
 
     if (type === "sent") {
-      // For sent contracts, add "Enviados" status
+      // For sent contracts, add "Enviados" and blockchain statuses
       return [
         ...commonStatuses,
         { value: "sent", label: "Enviados" },
+        { value: "awaiting_deposit", label: "Esperando Depósito" },
+        { value: "pending_acceptance", label: "Pendiente de Aceptación" },
       ];
     } else {
-      // For received contracts, add "Recibidos" status (maps to "sent" in DB)
+      // For received contracts, add "Recibidos" and pending acceptance
       return [
         ...commonStatuses,
         { value: "sent", label: "Recibidos" },
+        { value: "pending_acceptance", label: "Pendiente de Aceptación" },
       ];
     }
   };

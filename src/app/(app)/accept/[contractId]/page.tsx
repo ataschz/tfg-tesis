@@ -108,7 +108,7 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
 
   const rejectContract = async () => {
     const confirmed = window.confirm(
-      '¿Estás seguro de que quieres rechazar este contrato? Los fondos serán devueltos al cliente automáticamente.'
+      '¿Estás seguro de que quieres rechazar este contrato? Los fondos serán devueltos a la empresa automáticamente.'
     );
 
     if (!confirmed) return;
@@ -174,7 +174,7 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
             </div>
             
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-muted-foreground">Cliente</Label>
+              <Label className="text-sm font-medium text-muted-foreground">Empresa</Label>
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span>{contractData.client.name}</span>
@@ -310,7 +310,7 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
           <strong>Importante:</strong> Si aceptas este contrato, se activará y los fondos permanecerán en escrow 
-          hasta que se complete. Si lo rechazas, los fondos serán devueltos automáticamente al cliente.
+          hasta que se complete. Si lo rechazas, los fondos serán devueltos automáticamente a la empresa.
         </AlertDescription>
       </Alert>
     </div>

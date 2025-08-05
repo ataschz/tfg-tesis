@@ -64,6 +64,13 @@ class BlockchainService {
     description: string
   ): Promise<void> {
     try {
+      // Verificar si el contrato ya existe
+      const exists = await this.contract.doesContractExist(contractId);
+      if (exists) {
+        console.log(`Contract ${contractId} already exists, skipping creation`);
+        return; // No es un error, simplemente ya existe
+      }
+
       const endTimestamp = Math.floor(endDate.getTime() / 1000);
       const tx = await this.contract.createEscrow(
         contractId,

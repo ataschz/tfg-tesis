@@ -5,6 +5,7 @@ import {
   contracts, 
   contractClients, 
   contractContractors,
+  userProfiles,
   type NewContract,
   type NewContractClient,
   type NewContractContractor
@@ -132,20 +133,33 @@ export async function initializeBlockchainContract(contractId: string) {
       };
     }
 
+    // Verificar si el contrato ya está inicializado en blockchain
+    if (contract.blockchainContractId && contract.status !== 'sent') {
+      return {
+        success: true,
+        contractId,
+        escrowManagerAddress: blockchainService.getEscrowManagerAddress(),
+        totalAmount: contract.amount,
+        message: 'Contrato blockchain ya existe',
+      };
+    }
+
     // Obtener los datos del buyer (client) y seller (contractor)
     const [buyerData] = await db
       .select({
         walletAddress: user.walletAddress,
       })
-      .from(user)
-      .where(eq(user.id, currentUser.id));
+      .from(userProfiles)
+      .innerJoin(user, eq(userProfiles.userId, user.id))
+      .where(eq(userProfiles.id, contract.clientId));
 
     const [sellerData] = await db
       .select({
         walletAddress: user.walletAddress,
       })
-      .from(user)
-      .innerJoin(contractContractors, eq(user.id, contractContractors.contractorId))
+      .from(contractContractors)
+      .innerJoin(userProfiles, eq(contractContractors.contractorId, userProfiles.id))
+      .innerJoin(user, eq(userProfiles.userId, user.id))
       .where(eq(contractContractors.contractId, contractId))
       .limit(1);
 
