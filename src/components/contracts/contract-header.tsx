@@ -4,12 +4,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { 
-  CalendarDays, 
-  DollarSign, 
+import {
+  CalendarDays,
+  DollarSign,
   FileText,
   AlertTriangle,
-  Clock
+  Clock,
 } from "lucide-react";
 
 interface ContractHeaderProps {
@@ -23,6 +23,16 @@ export function ContractHeader({ contract }: ContractHeaderProps) {
         return {
           text: "Enviado",
           badge: "bg-blue-500/10 text-blue-600",
+        };
+      case "awaiting_deposit":
+        return {
+          text: "Esperando Depósito",
+          badge: "bg-yellow-500/10 text-yellow-600",
+        };
+      case "pending_acceptance":
+        return {
+          text: "Pendiente de Aceptación",
+          badge: "bg-orange-500/10 text-orange-600",
         };
       case "accepted":
         return {
@@ -73,9 +83,7 @@ export function ContractHeader({ contract }: ContractHeaderProps) {
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
               <h1 className="text-3xl font-bold">{contract.title}</h1>
-              <Badge className={status.badge}>
-                {status.text}
-              </Badge>
+              <Badge className={status.badge}>{status.text}</Badge>
             </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">ID del Contrato</p>
@@ -109,7 +117,9 @@ export function ContractHeader({ contract }: ContractHeaderProps) {
               <div>
                 <p className="text-sm text-muted-foreground">Inicio</p>
                 <p className="font-semibold">
-                  {format(new Date(contract.startDate), "d MMM yyyy", { locale: es })}
+                  {format(new Date(contract.startDate), "d MMM yyyy", {
+                    locale: es,
+                  })}
                 </p>
               </div>
             </div>
@@ -121,7 +131,9 @@ export function ContractHeader({ contract }: ContractHeaderProps) {
               <div>
                 <p className="text-sm text-muted-foreground">Finalización</p>
                 <p className="font-semibold">
-                  {format(new Date(contract.endDate), "d MMM yyyy", { locale: es })}
+                  {format(new Date(contract.endDate), "d MMM yyyy", {
+                    locale: es,
+                  })}
                 </p>
               </div>
             </div>

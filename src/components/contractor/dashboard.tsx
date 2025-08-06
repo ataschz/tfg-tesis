@@ -56,7 +56,7 @@ export function ContractorDashboard() {
     <div className="space-y-8 pb-8">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">
-          ¡Hola, Ata Herrera {data.user.firstName}! 👋
+          ¡Hola, {data.user.firstName}! 👋
         </h1>
         <p className="text-lg text-muted-foreground">
           Bienvenido a tu panel de control. Aquí puedes gestionar tus contratos

@@ -1,9 +1,9 @@
-import { db } from '@/lib/db';
-import { contracts, contractContractors } from '@/lib/db/schema/platform';
-import { user } from '@/lib/db/schema/auth';
-import { requireAuth } from '@/lib/auth';
-import { eq, and } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
+import { db } from "@/lib/db";
+import { contracts, contractContractors } from "@/lib/db/schema/platform";
+import { user } from "@/lib/db/schema/auth";
+import { requireAuth } from "@/lib/auth";
+import { eq, and } from "drizzle-orm";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   request: NextRequest,
@@ -12,14 +12,24 @@ export async function POST(
   try {
     const currentUser = await requireAuth();
     const { contractId } = await params;
-    
-    const requestBody = await request.json();
-    
-    const { walletAddress } = requestBody;
 
-    if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
+    // Obtener la información del usuario incluyendo wallet address
+    const [userData] = await db
+      .select({ walletAddress: user.walletAddress })
+      .from(user)
+      .where(eq(user.id, currentUser.id));
+
+    // Verificar que el usuario tenga una wallet address configurada
+    if (
+      !userData?.walletAddress ||
+      !/^0x[a-fA-F0-9]{40}$/.test(userData.walletAddress)
+    ) {
       return NextResponse.json(
-        { success: false, error: 'Dirección de wallet inválida' },
+        {
+          success: false,
+          error:
+            "Debes configurar una dirección de wallet válida en tu perfil antes de aceptar contratos",
+        },
         { status: 400 }
       );
     }
@@ -32,32 +42,28 @@ export async function POST(
 
     if (!contract) {
       return NextResponse.json(
-        { success: false, error: 'Contrato no encontrado' },
+        { success: false, error: "Contrato no encontrado" },
         { status: 404 }
       );
     }
 
-    if (contract.status !== 'pending_acceptance') {
+    if (contract.status !== "pending_acceptance") {
       return NextResponse.json(
-        { success: false, error: 'El contrato no está disponible para aceptación' },
+        {
+          success: false,
+          error: "El contrato no está disponible para aceptación",
+        },
         { status: 400 }
       );
     }
 
-    // Actualizar la wallet address del usuario actual
-    await db
-      .update(user)
-      .set({
-        walletAddress,
-        updatedAt: new Date(),
-      })
-      .where(eq(user.id, currentUser.id));
+    // La wallet address ya está configurada en el perfil del usuario, no es necesario actualizarla
 
     // Actualizar el estado del contrato a 'accepted'
     await db
       .update(contracts)
       .set({
-        status: 'accepted',
+        status: "accepted",
         acceptedAt: new Date(),
         updatedAt: new Date(),
       })
@@ -65,13 +71,13 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: 'Contrato aceptado exitosamente. Los fondos están ahora asegurados en escrow.',
+      message:
+        "Contrato aceptado exitosamente. Los fondos están ahora asegurados en escrow.",
     });
-
   } catch (error) {
-    console.error('Error accepting contract:', error);
+    console.error("Error accepting contract:", error);
     return NextResponse.json(
-      { success: false, error: 'Error interno del servidor' },
+      { success: false, error: "Error interno del servidor" },
       { status: 500 }
     );
   }

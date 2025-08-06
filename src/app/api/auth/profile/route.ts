@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema/auth";
+import { eq } from "drizzle-orm";
 import {
   getUserProfileByAuthId,
   createCompleteProfile,
@@ -26,7 +29,20 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json(userProfile);
+    // Get user auth data including wallet address
+    const authUser = await db.query.user.findFirst({
+      where: eq(user.id, session.user.id),
+      columns: {
+        walletAddress: true,
+        email: true,
+      },
+    });
+
+    return NextResponse.json({
+      ...userProfile,
+      authUser,
+      walletAddress: authUser?.walletAddress, // Include for easier access
+    });
   } catch (error) {
     console.error("Error obteniendo perfil:", error);
     return NextResponse.json(

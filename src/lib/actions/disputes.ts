@@ -5,6 +5,7 @@ import { disputes, contracts, disputeEvidence } from "@/lib/db/schema/platform";
 import { requireAuth } from "@/lib/auth";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { blockchainService } from "@/lib/blockchain";
 
 export async function createDispute(formData: {
   contractId: string;
@@ -22,12 +23,12 @@ export async function createDispute(formData: {
       where: eq(contracts.id, formData.contractId),
       with: {
         contractClients: {
-          with: { client: true }
+          with: { client: true },
         },
         contractContractors: {
-          with: { contractor: true }
-        }
-      }
+          with: { contractor: true },
+        },
+      },
     });
 
     if (!contract) {
@@ -37,11 +38,23 @@ export async function createDispute(formData: {
     // Check if user is a participant in the contract
     const isClient = contract.clientId === user.profile.id;
     const isContractor = contract.contractorId === user.profile.id;
-    const isAdditionalClient = contract.contractClients?.some(cc => cc.clientId === user.profile.id);
-    const isAdditionalContractor = contract.contractContractors?.some(cc => cc.contractorId === user.profile.id);
+    const isAdditionalClient = contract.contractClients?.some(
+      (cc) => cc.clientId === user.profile.id
+    );
+    const isAdditionalContractor = contract.contractContractors?.some(
+      (cc) => cc.contractorId === user.profile.id
+    );
 
-    if (!isClient && !isContractor && !isAdditionalClient && !isAdditionalContractor) {
-      return { success: false, error: "No tienes permisos para crear una disputa en este contrato" };
+    if (
+      !isClient &&
+      !isContractor &&
+      !isAdditionalClient &&
+      !isAdditionalContractor
+    ) {
+      return {
+        success: false,
+        error: "No tienes permisos para crear una disputa en este contrato",
+      };
     }
 
     // Check if contract is already in dispute
@@ -51,40 +64,77 @@ export async function createDispute(formData: {
 
     // Check if contract can be disputed (should be accepted or in_progress)
     if (!["accepted", "in_progress", "completed"].includes(contract.status)) {
-      return { success: false, error: "Solo se pueden disputar contratos aceptados, en progreso o completados" };
+      return {
+        success: false,
+        error:
+          "Solo se pueden disputar contratos aceptados, en progreso o completados",
+      };
     }
 
     // Mediators cannot initiate disputes, they can only mediate them
     if (user.profile.userType === "mediator") {
-      return { success: false, error: "Los mediadores no pueden iniciar disputas" };
+      return {
+        success: false,
+        error: "Los mediadores no pueden iniciar disputas",
+      };
     }
 
     return await db.transaction(async (tx) => {
       // Determine who initiated the dispute (contractor or client)
-      const initiatedBy = user.profile.userType === "contractor" ? "contractor" : "client";
+      const initiatedBy =
+        user.profile.userType === "contractor" ? "contractor" : "client";
 
       // Create the dispute
-      const [dispute] = await tx.insert(disputes).values({
-        contractId: formData.contractId,
-        initiatorId: user.profile.id,
-        initiatedBy,
-        reason: formData.reason,
-        description: formData.description,
-        status: "open",
-        milestoneId: formData.disputeType === "partial" ? formData.milestoneId || null : null,
-      }).returning();
+      const [dispute] = await tx
+        .insert(disputes)
+        .values({
+          contractId: formData.contractId,
+          initiatorId: user.profile.id,
+          initiatedBy,
+          reason: formData.reason,
+          description: formData.description,
+          status: "open",
+          milestoneId:
+            formData.disputeType === "partial"
+              ? formData.milestoneId || null
+              : null,
+        })
+        .returning();
 
       // Update contract status to in_dispute
-      await tx.update(contracts)
-        .set({ 
+      await tx
+        .update(contracts)
+        .set({
           status: "in_dispute",
-          updatedAt: new Date()
+          updatedAt: new Date(),
         })
         .where(eq(contracts.id, formData.contractId));
 
+      // Mark the contract as disputed in the blockchain
+      if (contract.blockchainContractId) {
+        try {
+          await blockchainService.setDisputed(contract.blockchainContractId);
+          console.log(
+            "✅ Contract marked as disputed in blockchain:",
+            contract.blockchainContractId
+          );
+        } catch (blockchainError) {
+          console.error(
+            "❌ Error marking contract as disputed in blockchain:",
+            blockchainError
+          );
+          // Don't fail the transaction if blockchain call fails, but log it
+          // The admin can manually set disputed status if needed
+        }
+      } else {
+        console.warn(
+          "⚠️ Contract does not have blockchainContractId, cannot mark as disputed in blockchain"
+        );
+      }
+
       // Add evidence files if provided (mocked for now)
       if (formData.evidenceFiles && formData.evidenceFiles.length > 0) {
-        const evidenceData = formData.evidenceFiles.map(fileUrl => ({
+        const evidenceData = formData.evidenceFiles.map((fileUrl) => ({
           disputeId: dispute.id,
           userProfileId: user.profile.id,
           evidenceType: "document" as const,
@@ -102,14 +152,14 @@ export async function createDispute(formData: {
       return {
         success: true,
         message: "Disputa creada exitosamente",
-        disputeId: dispute.id
+        disputeId: dispute.id,
       };
     });
   } catch (error) {
     console.error("Error creating dispute:", error);
     return {
       success: false,
-      error: "Error interno del servidor al crear la disputa"
+      error: "Error interno del servidor al crear la disputa",
     };
   }
 }
@@ -125,17 +175,17 @@ export async function getDisputedContracts() {
           with: {
             clientProfile: true,
             authUser: {
-              columns: { email: true }
-            }
-          }
+              columns: { email: true },
+            },
+          },
         },
         contractor: {
           with: {
             contractorProfile: true,
             authUser: {
-              columns: { email: true }
-            }
-          }
+              columns: { email: true },
+            },
+          },
         },
         contractClients: {
           with: {
@@ -143,11 +193,11 @@ export async function getDisputedContracts() {
               with: {
                 clientProfile: true,
                 authUser: {
-                  columns: { email: true }
-                }
-              }
-            }
-          }
+                  columns: { email: true },
+                },
+              },
+            },
+          },
         },
         contractContractors: {
           with: {
@@ -155,34 +205,44 @@ export async function getDisputedContracts() {
               with: {
                 contractorProfile: true,
                 authUser: {
-                  columns: { email: true }
-                }
-              }
-            }
-          }
+                  columns: { email: true },
+                },
+              },
+            },
+          },
         },
         disputes: {
           with: {
             initiator: true,
-            mediator: true
-          }
-        }
-      }
+            mediator: true,
+          },
+        },
+      },
     });
 
     // Filter contracts where user is a participant
-    const userContracts = disputedContracts.filter(contract => {
+    const userContracts = disputedContracts.filter((contract) => {
       const isClient = contract.clientId === user.profile.id;
       const isContractor = contract.contractorId === user.profile.id;
-      const isAdditionalClient = contract.contractClients?.some(cc => cc.clientId === user.profile.id);
-      const isAdditionalContractor = contract.contractContractors?.some(cc => cc.contractorId === user.profile.id);
-      
-      return isClient || isContractor || isAdditionalClient || isAdditionalContractor;
+      const isAdditionalClient = contract.contractClients?.some(
+        (cc) => cc.clientId === user.profile.id
+      );
+      const isAdditionalContractor = contract.contractContractors?.some(
+        (cc) => cc.contractorId === user.profile.id
+      );
+
+      return (
+        isClient || isContractor || isAdditionalClient || isAdditionalContractor
+      );
     });
 
     return { success: true, contracts: userContracts };
   } catch (error) {
     console.error("Error fetching disputed contracts:", error);
-    return { success: false, error: "Error al obtener contratos en disputa", contracts: [] };
+    return {
+      success: false,
+      error: "Error al obtener contratos en disputa",
+      contracts: [],
+    };
   }
 }

@@ -9,6 +9,7 @@ import {
   Users,
   Building2,
   AlertCircle,
+  AlertTriangle,
   Wallet,
 } from "lucide-react";
 import { useMetaMask } from "@/hooks/useMetaMask";
@@ -61,6 +62,20 @@ export function DisputeActions({
           toast.error("No se pudo conectar a MetaMask");
           return;
         }
+      }
+
+      // Ensure the contract is marked as disputed in blockchain before resolving
+      try {
+        await metaMask.setDisputed(dispute.contract.blockchainContractId);
+        console.log(
+          "✅ Contract marked as disputed in blockchain (if not already)"
+        );
+      } catch (setDisputedError) {
+        console.log(
+          "ℹ️ Contract might already be disputed or setDisputed failed:",
+          setDisputedError
+        );
+        // Continue anyway - the contract might already be disputed
       }
 
       toast.loading(
@@ -192,6 +207,35 @@ export function DisputeActions({
 
             {isAssigned && canResolve && (
               <div className="space-y-2">
+                <Button
+                  className="gap-2 w-full"
+                  onClick={async () => {
+                    try {
+                      if (!metaMask.isConnected) {
+                        await metaMask.connect();
+                      }
+                      if (dispute.contract.blockchainContractId) {
+                        const success = await metaMask.setDisputed(
+                          dispute.contract.blockchainContractId
+                        );
+                        if (success) {
+                          toast.success(
+                            "Contrato marcado como disputado en blockchain"
+                          );
+                        }
+                      }
+                    } catch (error) {
+                      toast.error("Error al marcar como disputado");
+                    }
+                  }}
+                  disabled={!metaMask.isAvailable}
+                  variant="outline"
+                  size="sm"
+                >
+                  <AlertTriangle className="h-4 w-4" />
+                  Marcar como Disputado
+                </Button>
+
                 <Button
                   className="gap-2 w-full"
                   onClick={() => handleMetaMaskResolve("contractor")}

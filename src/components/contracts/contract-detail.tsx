@@ -10,7 +10,14 @@ import { ContractDeliverables } from "./contract-deliverables";
 import { ContractTerms } from "./contract-terms";
 import { DisputeDialog } from "@/components/disputes/dispute-dialog";
 import { ReviewDialog } from "@/components/reviews/review-dialog";
-import { ArrowLeft, AlertTriangle, CheckCircle, XCircle, Banknote } from "lucide-react";
+import {
+  ArrowLeft,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Banknote,
+  Wallet,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { checkUserReviewStatus } from "@/lib/actions/reviews";
@@ -39,7 +46,7 @@ export function ContractDetail({
   const [isAccepting, setIsAccepting] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [isReleasingFunds, setIsReleasingFunds] = useState(false);
-  
+
   const metaMask = useMetaMask();
 
   // Check if dispute can be initiated
@@ -48,17 +55,26 @@ export function ContractDetail({
   );
 
   // Determine user type
-  const userIsClient = contract.clientId === currentUserId ||
+  const userIsClient =
+    contract.clientId === currentUserId ||
     contract.contractClients?.some((cc: any) => cc.clientId === currentUserId);
-  
-  const userIsContractor = contract.contractorId === currentUserId ||
-    contract.contractContractors?.some((cc: any) => cc.contractorId === currentUserId);
+
+  const userIsContractor =
+    contract.contractorId === currentUserId ||
+    contract.contractContractors?.some(
+      (cc: any) => cc.contractorId === currentUserId
+    );
 
   // Check if contractor can accept/reject (disabled for demo - use dashboard instead)
   const canAcceptReject = false; // userIsContractor && contract.status === "pending_acceptance";
-  
+
   // Check if buyer can release funds
-  const canReleaseFunds = userIsClient && (contract.status === "accepted" || contract.status === "in_progress");
+  const canReleaseFunds =
+    userIsClient &&
+    (contract.status === "accepted" || contract.status === "in_progress");
+
+  // Check if buyer needs to make deposit
+  const needsDeposit = userIsClient && contract.status === "awaiting_deposit";
 
   // Check if reviews can be left (contract is in final state)
   const canLeaveReviews = ["completed", "cancelled"].includes(contract.status);
@@ -146,20 +162,20 @@ export function ContractDetail({
     setIsAccepting(true);
     try {
       const response = await fetch(`/api/contracts/${contract.id}/accept`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
 
       const result = await response.json();
 
       if (result.success) {
-        toast.success('¡Contrato aceptado exitosamente!');
+        toast.success("¡Contrato aceptado exitosamente!");
         setTimeout(() => window.location.reload(), 2000);
       } else {
-        toast.error(result.error || 'Error al aceptar el contrato');
+        toast.error(result.error || "Error al aceptar el contrato");
       }
     } catch (error) {
-      toast.error('Error inesperado al procesar la aceptación');
+      toast.error("Error inesperado al procesar la aceptación");
     } finally {
       setIsAccepting(false);
     }
@@ -169,20 +185,22 @@ export function ContractDetail({
     setIsRejecting(true);
     try {
       const response = await fetch(`/api/contracts/${contract.id}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
 
       const result = await response.json();
 
       if (result.success) {
-        toast.success('Contrato rechazado. Los fondos han sido devueltos a la empresa.');
+        toast.success(
+          "Contrato rechazado. Los fondos han sido devueltos a la empresa."
+        );
         setTimeout(() => window.location.reload(), 2000);
       } else {
-        toast.error(result.error || 'Error al rechazar el contrato');
+        toast.error(result.error || "Error al rechazar el contrato");
       }
     } catch (error) {
-      toast.error('Error inesperado al procesar el rechazo');
+      toast.error("Error inesperado al procesar el rechazo");
     } finally {
       setIsRejecting(false);
     }
@@ -190,7 +208,7 @@ export function ContractDetail({
 
   const handleReleaseFunds = async () => {
     if (!contract.blockchainContractId) {
-      toast.error('Este contrato no tiene un ID de blockchain válido');
+      toast.error("Este contrato no tiene un ID de blockchain válido");
       return;
     }
 
@@ -200,15 +218,17 @@ export function ContractDetail({
       if (!metaMask.isConnected) {
         await metaMask.connect();
         if (!metaMask.isConnected) {
-          toast.error('No se pudo conectar a MetaMask');
+          toast.error("No se pudo conectar a MetaMask");
           return;
         }
       }
 
-      toast.loading('Liberando fondos...');
+      toast.loading("Liberando fondos...");
 
       // Get the escrow manager address from environment
-      const escrowManagerAddress = process.env.NEXT_PUBLIC_ESCROW_MANAGER_ADDRESS || '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
+      const escrowManagerAddress =
+        process.env.NEXT_PUBLIC_ESCROW_MANAGER_ADDRESS ||
+        "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 
       // Release the funds
       const success = await metaMask.releaseFunds(
@@ -217,13 +237,15 @@ export function ContractDetail({
       );
 
       if (success) {
-        toast.success('¡Fondos liberados exitosamente! El contrato ha sido completado.');
+        toast.success(
+          "¡Fondos liberados exitosamente! El contrato ha sido completado."
+        );
         setTimeout(() => window.location.reload(), 2000);
       } else {
-        toast.error(metaMask.error || 'Error al liberar los fondos');
+        toast.error(metaMask.error || "Error al liberar los fondos");
       }
     } catch (error) {
-      toast.error('Error inesperado al procesar la liberación de fondos');
+      toast.error("Error inesperado al procesar la liberación de fondos");
     } finally {
       setIsReleasingFunds(false);
     }
@@ -243,6 +265,16 @@ export function ContractDetail({
         </Button>
 
         <div className="flex items-center gap-3 flex-wrap">
+          {/* Deposit button for buyers */}
+          {needsDeposit && (
+            <Button
+              onClick={() => router.push(`/new/deposit/${contract.id}`)}
+              className="gap-2 bg-blue-600 hover:bg-blue-700"
+            >
+              <Wallet className="h-4 w-4" />
+              Realizar Depósito
+            </Button>
+          )}
 
           {/* Release funds button for buyers */}
           {canReleaseFunds && (
@@ -303,100 +335,6 @@ export function ContractDetail({
 
       {/* Contract Header */}
       <ContractHeader contract={contract} />
-
-      {/* Action Status Card */}
-      {(canAcceptReject || canReleaseFunds) && (
-        <Card className="p-4 border-l-4 border-l-blue-500 bg-blue-50/50">
-          <div className="flex items-center justify-between">
-            <div>
-              {canAcceptReject && (
-                <div>
-                  <h3 className="font-semibold text-blue-900">Acción Requerida</h3>
-                  <p className="text-sm text-blue-700">
-                    Este contrato está esperando tu respuesta. Revisa los detalles y decide si aceptar o rechazar.
-                  </p>
-                </div>
-              )}
-              {canReleaseFunds && (
-                <div>
-                  <h3 className="font-semibold text-green-900">¿Trabajo Completado?</h3>
-                  <p className="text-sm text-green-700">
-                    Si estás satisfecho con el trabajo realizado, puedes liberar los fondos al freelancer.
-                  </p>
-                </div>
-              )}
-            </div>
-            <div className="flex gap-2">
-              {canAcceptReject && (
-                <>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleRejectContract}
-                    disabled={isRejecting || isAccepting}
-                    className="gap-2"
-                  >
-                    {isRejecting ? (
-                      <>
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        Rechazando...
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="h-4 w-4" />
-                        Rechazar
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleAcceptContract}
-                    disabled={isAccepting || isRejecting}
-                    className="gap-2"
-                  >
-                    {isAccepting ? (
-                      <>
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        Aceptando...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="h-4 w-4" />
-                        Aceptar
-                      </>
-                    )}
-                  </Button>
-                </>
-              )}
-              {canReleaseFunds && (
-                <Button
-                  size="sm"
-                  onClick={handleReleaseFunds}
-                  disabled={isReleasingFunds || !metaMask.isAvailable}
-                  className="gap-2 bg-green-600 hover:bg-green-700"
-                >
-                  {isReleasingFunds ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Liberando...
-                    </>
-                  ) : (
-                    <>
-                      <Banknote className="h-4 w-4" />
-                      Liberar Fondos
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-          </div>
-          {metaMask.error && canReleaseFunds && (
-            <div className="mt-2 text-sm text-red-600">
-              {metaMask.error}
-            </div>
-          )}
-        </Card>
-      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Column - Main Info */}

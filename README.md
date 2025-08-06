@@ -115,46 +115,46 @@ Your app will be available at **http://localhost:3001**
 
 Import these accounts in **3 different browsers** for the full demo:
 
-#### 🏢 Account 0 - Company/Buyer
+#### ⚖️ Account 0 - Admin/Mediator
 
 - **Address**: `0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
 - **Private Key**: `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`
-- **Email**: `ata@retrip.io`
-- **Role**: Creates contracts and deposits ETH
+- **Email**: `admin@treto.com`
+- **Role**: Deploys contracts, resolves disputes and mediates conflicts
 
-#### 👨‍💻 Account 1 - Freelancer/Contractor
+#### 🏢 Account 1 - Company/Buyer
 
 - **Address**: `0x70997970C51812dc3A010C7d01b50e0d17dc79C8`
 - **Private Key**: `0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d`
-- **Email**: `gahs94@gmail.com`
-- **Role**: Receives contracts and completes work
+- **Email**: `company@retrip.io`
+- **Role**: Creates contracts and deposits ETH
 
-#### ⚖️ Account 2 - Admin/Mediator
+#### 👨‍💻 Account 2 - Freelancer/Contractor
 
 - **Address**: `0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC`
 - **Private Key**: `0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a`
-- **Email**: `ata@trato.com`
-- **Role**: Resolves disputes and mediates conflicts
+- **Email**: `freelancer@gmail.com`
+- **Role**: Receives contracts and completes work
 
 ### 📱 Multi-Browser Demo Setup
 
-**Browser 1 (Chrome) - Company:**
+**Browser 1 (Chrome) - Admin:**
 
 1. Install MetaMask → Add Hardhat Local network
 2. Import Account 0 using private key
-3. Go to http://localhost:3001 → Sign in with `ata@retrip.io`
+3. Go to http://localhost:3001 → Sign in with `admin@treto.com`
 
-**Browser 2 (Safari) - Freelancer:**
+**Browser 2 (Safari) - Company:**
 
 1. Install MetaMask → Add Hardhat Local network
 2. Import Account 1 using private key
-3. Go to http://localhost:3001 → Sign in with `gahs94@gmail.com`
+3. Go to http://localhost:3001 → Sign in with `company@retrip.io`
 
-**Browser 3 (Firefox) - Admin:**
+**Browser 3 (Firefox) - Freelancer:**
 
 1. Install MetaMask → Add Hardhat Local network
 2. Import Account 2 using private key
-3. Go to http://localhost:3001 → Sign in with `ata@trato.com`
+3. Go to http://localhost:3001 → Sign in with `freelancer@gmail.com`
 
 ## 🎯 Demo Flow
 

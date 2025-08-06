@@ -57,14 +57,18 @@ export function ContractCard({ contract, type }: ContractCardProps) {
   const [showDisputeDialog, setShowDisputeDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isReleasingFunds, setIsReleasingFunds] = useState(false);
-  
+
   const metaMask = useMetaMask();
 
   const startDate = new Date(contract.startDate);
   const endDate = new Date(contract.endDate);
-  const isActive = contract.status === "active" || contract.status === "in_progress";
+  const isActive =
+    contract.status === "active" || contract.status === "in_progress";
 
-  const getStatusInfo = (status: string, contractType: "received" | "sent" | "disputed") => {
+  const getStatusInfo = (
+    status: string,
+    contractType: "received" | "sent" | "disputed"
+  ) => {
     switch (status) {
       case "sent":
         return {
@@ -123,7 +127,7 @@ export function ContractCard({ contract, type }: ContractCardProps) {
 
   const handleReleaseFunds = async () => {
     if (!contract.blockchainContractId) {
-      toast.error('Este contrato no tiene un ID de blockchain válido');
+      toast.error("Este contrato no tiene un ID de blockchain válido");
       return;
     }
 
@@ -133,15 +137,17 @@ export function ContractCard({ contract, type }: ContractCardProps) {
       if (!metaMask.isConnected) {
         await metaMask.connect();
         if (!metaMask.isConnected) {
-          toast.error('No se pudo conectar a MetaMask');
+          toast.error("No se pudo conectar a MetaMask");
           return;
         }
       }
 
-      toast.loading('Liberando fondos...');
+      toast.loading("Liberando fondos...");
 
       // Get the escrow manager address from environment or contract data
-      const escrowManagerAddress = process.env.NEXT_PUBLIC_ESCROW_MANAGER_ADDRESS || '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0';
+      const escrowManagerAddress =
+        process.env.NEXT_PUBLIC_ESCROW_MANAGER_ADDRESS ||
+        "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 
       // Release the funds
       const success = await metaMask.releaseFunds(
@@ -150,22 +156,23 @@ export function ContractCard({ contract, type }: ContractCardProps) {
       );
 
       if (success) {
-        toast.success('¡Fondos liberados exitosamente! El contrato ha sido completado.');
-        
+        toast.success(
+          "¡Fondos liberados exitosamente! El contrato ha sido completado."
+        );
+
         // Refresh the page to show updated status
         setTimeout(() => {
           window.location.reload();
         }, 2000);
       } else {
-        toast.error(metaMask.error || 'Error al liberar los fondos');
+        toast.error(metaMask.error || "Error al liberar los fondos");
       }
     } catch (error) {
-      toast.error('Error inesperado al procesar la liberación de fondos');
+      toast.error("Error inesperado al procesar la liberación de fondos");
     } finally {
       setIsReleasingFunds(false);
     }
   };
-
 
   return (
     <>
@@ -191,7 +198,9 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => router.push(`/contracts/${contract.id}`)}>
+                <DropdownMenuItem
+                  onClick={() => router.push(`/contracts/${contract.id}`)}
+                >
                   <Eye className="mr-2 h-4 w-4" />
                   Ver detalle
                 </DropdownMenuItem>
@@ -271,7 +280,8 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                             <Avatar className="h-8 w-8 border-2 border-background transition-transform hover:scale-105 hover:z-10">
                               <AvatarImage
                                 src={`https://avatar.vercel.sh/${
-                                  contract.client.company || contract.client.firstName
+                                  contract.client.company ||
+                                  contract.client.firstName
                                 }`}
                                 alt={
                                   contract.client.company ||
@@ -287,7 +297,10 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                           </Link>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{contract.client.company || `${contract.client.firstName} ${contract.client.lastName}`}</p>
+                          <p>
+                            {contract.client.company ||
+                              `${contract.client.firstName} ${contract.client.lastName}`}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -324,7 +337,11 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                           </Link>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{contract.contractor.username ? `@${contract.contractor.username}` : `${contract.contractor.firstName} ${contract.contractor.lastName}`}</p>
+                          <p>
+                            {contract.contractor.username
+                              ? `@${contract.contractor.username}`
+                              : `${contract.contractor.firstName} ${contract.contractor.lastName}`}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -346,7 +363,9 @@ export function ContractCard({ contract, type }: ContractCardProps) {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => router.push(`/accept/${contract.id}?action=reject`)}
+                  onClick={() =>
+                    router.push(`/accept/${contract.id}?action=reject`)
+                  }
                   className="gap-2"
                 >
                   <XCircle className="h-4 w-4" />
@@ -364,44 +383,7 @@ export function ContractCard({ contract, type }: ContractCardProps) {
             </div>
           </div>
         )}
-
-        {/* Action Buttons for Release Funds (Buyer) */}
-        {type === "sent" && (contract.status === "accepted" || contract.status === "in_progress") && (
-          <div className="border-t border-border/50 bg-green-50/50 p-4">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                ¿Estás satisfecho con el trabajo? Libera los fondos al freelancer
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={handleReleaseFunds}
-                  disabled={isReleasingFunds || !metaMask.isAvailable}
-                  className="gap-2"
-                >
-                  {isReleasingFunds ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                      Liberando...
-                    </>
-                  ) : (
-                    <>
-                      <Banknote className="h-4 w-4" />
-                      Liberar Fondos
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-            {metaMask.error && (
-              <div className="mt-2 text-sm text-red-600">
-                {metaMask.error}
-              </div>
-            )}
-          </div>
-        )}
       </Card>
-
 
       {/* Dispute Dialog */}
       <DisputeDialog
@@ -409,11 +391,13 @@ export function ContractCard({ contract, type }: ContractCardProps) {
         onOpenChange={setShowDisputeDialog}
         contractId={contract.id}
         contractTitle={contract.title}
-        milestones={contract.deliverables?.map((deliverable: any, index: number) => ({
-          id: `deliverable-${index}`,
-          title: deliverable.title || `Entregable ${index + 1}`,
-          description: deliverable.description || deliverable
-        })) || []}
+        milestones={
+          contract.deliverables?.map((deliverable: any, index: number) => ({
+            id: `deliverable-${index}`,
+            title: deliverable.title || `Entregable ${index + 1}`,
+            description: deliverable.description || deliverable,
+          })) || []
+        }
       />
     </>
   );
