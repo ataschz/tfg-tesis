@@ -223,6 +223,25 @@ export function ContractDetail({
         }
       }
 
+      // Get user profile to check wallet address
+      const profileResponse = await fetch('/api/auth/profile');
+      const profileData = await profileResponse.json();
+      const userWalletAddress = profileData.walletAddress;
+
+      if (!userWalletAddress) {
+        toast.error("No tienes una wallet address configurada en tu perfil");
+        return;
+      }
+
+      // Check if connected MetaMask account matches user's registered wallet
+      if (metaMask.account && metaMask.account.toLowerCase() !== userWalletAddress.toLowerCase()) {
+        toast.error(
+          `Debes conectar MetaMask con tu wallet registrada: ${userWalletAddress}. ` +
+          `Actualmente conectado con: ${metaMask.account}`
+        );
+        return;
+      }
+
       toast.loading("Liberando fondos...");
 
       // Get the escrow manager address from environment
@@ -262,7 +281,16 @@ export function ContractDetail({
           toast.error("Fondos liberados pero error al actualizar estado: " + (result.error || "Error desconocido"));
         }
       } else {
-        toast.error(metaMask.error || "Error al liberar los fondos");
+        // Provide more helpful error message
+        const errorMsg = metaMask.error || "Error al liberar los fondos";
+        if (errorMsg.includes("Solo el buyer puede ejecutar esta funcion")) {
+          toast.error(
+            "Solo el comprador (buyer) registrado en el contrato puede liberar los fondos. " +
+            "Verifica que estés conectado con la wallet correcta en MetaMask."
+          );
+        } else {
+          toast.error(errorMsg);
+        }
       }
     } catch (error) {
       console.error("Error releasing funds:", error);
