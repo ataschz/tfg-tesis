@@ -72,7 +72,8 @@ pnpm db:seed
 **Terminal 1 - Start Blockchain:**
 
 ```bash
-# This will start Hardhat local blockchain on port 8545
+# This will auto-clean and start fresh Hardhat blockchain on port 8545
+# All accounts will have 10,000 ETH each time
 pnpm blockchain:node
 ```
 

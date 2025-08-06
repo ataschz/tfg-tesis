@@ -54,8 +54,8 @@ export function ContractDetail({
   const userIsContractor = contract.contractorId === currentUserId ||
     contract.contractContractors?.some((cc: any) => cc.contractorId === currentUserId);
 
-  // Check if contractor can accept/reject
-  const canAcceptReject = userIsContractor && contract.status === "pending_acceptance";
+  // Check if contractor can accept/reject (disabled for demo - use dashboard instead)
+  const canAcceptReject = false; // userIsContractor && contract.status === "pending_acceptance";
   
   // Check if buyer can release funds
   const canReleaseFunds = userIsClient && (contract.status === "accepted" || contract.status === "in_progress");
@@ -243,46 +243,6 @@ export function ContractDetail({
         </Button>
 
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Accept/Reject buttons for contractors */}
-          {canAcceptReject && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                onClick={handleRejectContract}
-                disabled={isRejecting || isAccepting}
-                className="gap-2 border-red-200 text-red-700 hover:bg-red-50"
-              >
-                {isRejecting ? (
-                  <>
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Rechazando...
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="h-4 w-4" />
-                    Rechazar
-                  </>
-                )}
-              </Button>
-              <Button
-                onClick={handleAcceptContract}
-                disabled={isAccepting || isRejecting}
-                className="gap-2"
-              >
-                {isAccepting ? (
-                  <>
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                    Aceptando...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4" />
-                    Aceptar Contrato
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
 
           {/* Release funds button for buyers */}
           {canReleaseFunds && (

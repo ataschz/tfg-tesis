@@ -40,20 +40,19 @@ export async function UnifiedDashboard() {
     const userType = dashboardData.userType;
 
     if (userType === "client") {
-      // Para empresas: balance excluye completados y cancelados
+      // Para empresas: ETH aparece como comprometido desde pending_acceptance (después del depósito)
       const balanceContracts = allContracts.filter(
         (c: any) =>
           c.status === "sent" ||
+          c.status === "pending_acceptance" ||
           c.status === "accepted" ||
           c.status === "in_progress" ||
           c.status === "in_dispute"
       );
 
-      const withdrawableContracts = balanceContracts.filter(
-        (c: any) =>
-          c.status !== "accepted" &&
-          c.status !== "in_dispute" &&
-          c.status !== "in_progress"
+      // Solo contratos no depositados están disponibles para retiro
+      const withdrawableContracts = allContracts.filter(
+        (c: any) => c.status === "sent"
       );
 
       const balanceAmount = balanceContracts.reduce(
@@ -82,13 +81,13 @@ export async function UnifiedDashboard() {
         totalInDisputeContracts: allContracts.filter(
           (c: any) => c.status === "in_dispute"
         ).length,
-        currency: dashboardData.userProfile?.preferredCurrency || "USD",
+        currency: "ETH",
         userName: `${dashboardData.userProfile?.firstName || ""} ${
           dashboardData.userProfile?.lastName || ""
         }`.trim(),
       };
     } else {
-      // Para freelancers: balance incluye trabajos activos, completados y en disputa
+      // Para freelancers: ETH aparece como comprometido solo después de aceptar el contrato
       const activeContracts = allContracts.filter(
         (c: any) => c.status === "accepted" || c.status === "in_progress"
       );
@@ -101,7 +100,7 @@ export async function UnifiedDashboard() {
         (c: any) => c.status === "in_dispute"
       );
 
-      // Balance total: activos + completados + en disputa
+      // Balance total: solo contratos que el freelancer ha aceptado (accepted + in_progress + completed + in_dispute)
       const balanceContracts = allContracts.filter(
         (c: any) =>
           c.status === "accepted" ||
@@ -138,7 +137,7 @@ export async function UnifiedDashboard() {
         totalInDisputeAmount: disputeAmount,
         totalActiveContracts: activeContracts.length,
         totalInDisputeContracts: disputeContracts.length,
-        currency: dashboardData.userProfile?.preferredCurrency || "USD",
+        currency: "ETH",
         userName: `${dashboardData.userProfile?.firstName || ""} ${
           dashboardData.userProfile?.lastName || ""
         }`.trim(),

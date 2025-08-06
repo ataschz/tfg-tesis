@@ -7,11 +7,15 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { contractId: string } }
+  { params }: { params: Promise<{ contractId: string }> }
 ) {
   try {
     const currentUser = await requireAuth();
-    const { walletAddress } = await request.json();
+    const { contractId } = await params;
+    
+    const requestBody = await request.json();
+    
+    const { walletAddress } = requestBody;
 
     if (!walletAddress || !/^0x[a-fA-F0-9]{40}$/.test(walletAddress)) {
       return NextResponse.json(
@@ -24,7 +28,7 @@ export async function POST(
     const [contract] = await db
       .select()
       .from(contracts)
-      .where(eq(contracts.id, params.contractId));
+      .where(eq(contracts.id, contractId));
 
     if (!contract) {
       return NextResponse.json(
@@ -40,25 +44,7 @@ export async function POST(
       );
     }
 
-    // Verificar que el usuario actual es el contractor del contrato
-    const [contractorRecord] = await db
-      .select()
-      .from(contractContractors)
-      .where(
-        and(
-          eq(contractContractors.contractId, params.contractId),
-          eq(contractContractors.contractorId, currentUser.profile.id)
-        )
-      );
-
-    if (!contractorRecord) {
-      return NextResponse.json(
-        { success: false, error: 'No tienes permisos para aceptar este contrato' },
-        { status: 403 }
-      );
-    }
-
-    // Actualizar la wallet address del usuario
+    // Actualizar la wallet address del usuario actual
     await db
       .update(user)
       .set({
@@ -67,7 +53,7 @@ export async function POST(
       })
       .where(eq(user.id, currentUser.id));
 
-    // Actualizar el estado del contrato a 'accepted' (o 'in_progress')
+    // Actualizar el estado del contrato a 'accepted'
     await db
       .update(contracts)
       .set({
@@ -75,7 +61,7 @@ export async function POST(
         acceptedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(contracts.id, params.contractId));
+      .where(eq(contracts.id, contractId));
 
     return NextResponse.json({
       success: true,

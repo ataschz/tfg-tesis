@@ -1,7 +1,7 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { NextRequest, NextResponse } from "next/server";
 
-const EXCLUDED_ROUTES = ["sign-in", "sign-up", "api/auth/", "/"];
+const EXCLUDED_ROUTES = ["sign-in", "sign-up", "api/", "/"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

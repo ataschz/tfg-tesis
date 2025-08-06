@@ -1,22 +1,21 @@
 import { db } from '@/lib/db';
-import { contracts, contractClients, contractContractors } from '@/lib/db/schema/platform';
+import { contracts } from '@/lib/db/schema/platform';
 import { blockchainService } from '@/lib/blockchain';
-import { requireAuth } from '@/lib/auth';
-import { eq, and, or } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { contractId: string } }
+  { params }: { params: Promise<{ contractId: string }> }
 ) {
   try {
-    const currentUser = await requireAuth();
+    const { contractId } = await params;
 
     // Verificar que el contrato existe y está en estado apropiado
     const [contract] = await db
       .select()
       .from(contracts)
-      .where(eq(contracts.id, params.contractId));
+      .where(eq(contracts.id, contractId));
 
     if (!contract) {
       return NextResponse.json(
@@ -32,33 +31,7 @@ export async function POST(
       );
     }
 
-    // Verificar que el usuario actual es participante del contrato
-    const [clientRecord] = await db
-      .select()
-      .from(contractClients)
-      .where(
-        and(
-          eq(contractClients.contractId, params.contractId),
-          eq(contractClients.clientId, currentUser.profile.id)
-        )
-      );
-
-    const [contractorRecord] = await db
-      .select()
-      .from(contractContractors)
-      .where(
-        and(
-          eq(contractContractors.contractId, params.contractId),
-          eq(contractContractors.contractorId, currentUser.profile.id)
-        )
-      );
-
-    if (!clientRecord && !contractorRecord) {
-      return NextResponse.json(
-        { success: false, error: 'Solo los participantes del contrato pueden iniciar una disputa' },
-        { status: 403 }
-      );
-    }
+    // Para demo: sin verificación de participantes
 
     // Llamar al smart contract para marcar como disputado
     if (contract.blockchainContractId) {
@@ -80,7 +53,7 @@ export async function POST(
         status: 'in_dispute',
         updatedAt: new Date(),
       })
-      .where(eq(contracts.id, params.contractId));
+      .where(eq(contracts.id, contractId));
 
     return NextResponse.json({
       success: true,

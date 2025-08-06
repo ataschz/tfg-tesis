@@ -1,7 +1,6 @@
 import { db } from '@/lib/db';
 import { contracts } from '@/lib/db/schema/platform';
 import { blockchainService } from '@/lib/blockchain';
-import { requireAuth } from '@/lib/auth';
 import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,7 +9,6 @@ export async function GET(
   { params }: { params: Promise<{ contractId: string }> }
 ) {
   try {
-    await requireAuth();
     const { contractId } = await params;
 
     // Buscar el contrato en la DB

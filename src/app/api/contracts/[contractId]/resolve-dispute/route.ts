@@ -1,32 +1,24 @@
 import { db } from '@/lib/db';
 import { contracts } from '@/lib/db/schema/platform';
-import { user } from '@/lib/db/schema/auth';
 import { blockchainService } from '@/lib/blockchain';
-import { requireAuth } from '@/lib/auth';
 import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { contractId: string } }
+  { params }: { params: Promise<{ contractId: string }> }
 ) {
   try {
-    const currentUser = await requireAuth();
+    const { contractId } = await params;
     const { favorBuyer } = await request.json();
 
-    // Verificar que el usuario actual es admin
-    if (currentUser.role !== 'admin') {
-      return NextResponse.json(
-        { success: false, error: 'Solo los administradores pueden resolver disputas' },
-        { status: 403 }
-      );
-    }
+    // Para demo: sin verificación de admin
 
     // Verificar que el contrato existe y está en disputa
     const [contract] = await db
       .select()
       .from(contracts)
-      .where(eq(contracts.id, params.contractId));
+      .where(eq(contracts.id, contractId));
 
     if (!contract) {
       return NextResponse.json(
@@ -69,7 +61,7 @@ export async function POST(
         status: 'completed',
         updatedAt: new Date(),
       })
-      .where(eq(contracts.id, params.contractId));
+      .where(eq(contracts.id, contractId));
 
     const winner = favorBuyer ? 'empresa' : 'freelancer';
     const action = favorBuyer ? 'devueltos a la empresa' : 'liberados al freelancer';

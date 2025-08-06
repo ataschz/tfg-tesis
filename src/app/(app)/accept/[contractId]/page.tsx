@@ -18,11 +18,11 @@ import {
   User
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 
 interface AcceptContractPageProps {
-  params: { contractId: string };
+  params: Promise<{ contractId: string }>;
 }
 
 export default function AcceptContractPage({ params }: AcceptContractPageProps) {
@@ -30,10 +30,20 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
   const [walletAddress, setWalletAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
+  const [contractId, setContractId] = useState<string>('');
+
+  // Get contractId from params
+  React.useEffect(() => {
+    async function loadParams() {
+      const resolvedParams = await params;
+      setContractId(resolvedParams.contractId);
+    }
+    loadParams();
+  }, [params]);
 
   // Mock contract data - en implementación real, esto vendría de una API
   const contractData = {
-    id: params.contractId,
+    id: contractId || '',
     title: 'Desarrollo de Aplicación Web',
     description: 'Desarrollo completo de una aplicación web con React y Node.js',
     amount: '2.5',
@@ -70,6 +80,8 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
   };
 
   const acceptContract = async () => {
+    if (isLoading) return;
+    
     if (!walletAddress) {
       toast.error('Por favor, ingresa tu dirección de wallet');
       return;
@@ -80,10 +92,15 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
       return;
     }
 
+    if (!contractId) {
+      toast.error('Cargando datos del contrato...');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await fetch(`/api/contracts/${params.contractId}/accept`, {
+      const response = await fetch(`/api/contracts/${contractId}/accept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -100,6 +117,7 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
         toast.error(result.error || 'Error al aceptar el contrato');
       }
     } catch (error) {
+      console.error('Error:', error);
       toast.error('Error al aceptar el contrato');
     } finally {
       setIsLoading(false);
@@ -113,10 +131,15 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
 
     if (!confirmed) return;
 
+    if (!contractId) {
+      toast.error('Cargando datos del contrato...');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await fetch(`/api/contracts/${params.contractId}/reject`, {
+      const response = await fetch(`/api/contracts/${contractId}/reject`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -271,7 +294,7 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
       <div className="flex gap-4">
         <Button 
           onClick={acceptContract} 
-          disabled={isLoading || !isWalletValid || !walletAddress}
+          disabled={isLoading || !isWalletValid || !walletAddress || !contractId}
           className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
         >
           {isLoading ? (
@@ -284,7 +307,7 @@ export default function AcceptContractPage({ params }: AcceptContractPageProps) 
         
         <Button 
           onClick={rejectContract} 
-          disabled={isLoading}
+          disabled={isLoading || !contractId}
           variant="destructive"
           className="flex items-center gap-2"
         >

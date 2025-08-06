@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { useMetaMask } from '@/hooks/useMetaMask';
 
 interface DepositPageProps {
-  params: { contractId: string };
+  params: Promise<{ contractId: string }>;
 }
 
 interface ContractData {
@@ -28,21 +28,33 @@ export default function DepositPage({ params }: DepositPageProps) {
   const [isCheckingDeposit, setIsCheckingDeposit] = useState(false);
   const [isDepositing, setIsDepositing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [contractId, setContractId] = useState<string | null>(null);
   
   const metaMask = useMetaMask();
 
+  // Await params first
+  useEffect(() => {
+    const getParams = async () => {
+      const resolvedParams = await params;
+      setContractId(resolvedParams.contractId);
+    };
+    getParams();
+  }, [params]);
+
   const initializeContract = useCallback(async () => {
+    if (!contractId) return;
+
     setIsInitializing(true);
     setError(null);
 
     try {
-      const result = await initializeBlockchainContract(params.contractId);
+      const result = await initializeBlockchainContract(contractId);
 
       if (result.success) {
         setContractData({
           escrowManagerAddress: result.escrowManagerAddress || '',
           totalAmount: result.totalAmount || '0',
-          contractId: result.contractId || params.contractId,
+          contractId: result.contractId || contractId,
         });
         toast.success(result.message || 'Contrato inicializado correctamente');
       } else {
@@ -56,11 +68,13 @@ export default function DepositPage({ params }: DepositPageProps) {
     } finally {
       setIsInitializing(false);
     }
-  }, [params.contractId]);
+  }, [contractId]);
 
   useEffect(() => {
-    initializeContract();
-  }, [initializeContract]);
+    if (contractId) {
+      initializeContract();
+    }
+  }, [initializeContract, contractId]);
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -68,11 +82,11 @@ export default function DepositPage({ params }: DepositPageProps) {
   };
 
   const checkDeposit = async () => {
-    if (!contractData) return;
+    if (!contractData || !contractId) return;
 
     setIsCheckingDeposit(true);
     try {
-      const response = await fetch(`/api/contracts/${params.contractId}/check-deposit`);
+      const response = await fetch(`/api/contracts/${contractId}/check-deposit`);
       const result = await response.json();
 
       if (result.success) {

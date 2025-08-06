@@ -1,22 +1,21 @@
 import { db } from '@/lib/db';
-import { contracts, contractContractors } from '@/lib/db/schema/platform';
+import { contracts } from '@/lib/db/schema/platform';
 import { blockchainService } from '@/lib/blockchain';
-import { requireAuth } from '@/lib/auth';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { contractId: string } }
+  { params }: { params: Promise<{ contractId: string }> }
 ) {
   try {
-    const currentUser = await requireAuth();
+    const { contractId } = await params;
 
     // Verificar que el contrato existe y está en estado pending_acceptance
     const [contract] = await db
       .select()
       .from(contracts)
-      .where(eq(contracts.id, params.contractId));
+      .where(eq(contracts.id, contractId));
 
     if (!contract) {
       return NextResponse.json(
@@ -32,23 +31,7 @@ export async function POST(
       );
     }
 
-    // Verificar que el usuario actual es el contractor del contrato
-    const [contractorRecord] = await db
-      .select()
-      .from(contractContractors)
-      .where(
-        and(
-          eq(contractContractors.contractId, params.contractId),
-          eq(contractContractors.contractorId, currentUser.profile.id)
-        )
-      );
-
-    if (!contractorRecord) {
-      return NextResponse.json(
-        { success: false, error: 'No tienes permisos para rechazar este contrato' },
-        { status: 403 }
-      );
-    }
+    // Para demo: sin verificación de permisos
 
     // Llamar al smart contract para devolver los fondos al buyer
     if (contract.blockchainContractId) {
@@ -70,7 +53,7 @@ export async function POST(
         status: 'rejected',
         updatedAt: new Date(),
       })
-      .where(eq(contracts.id, params.contractId));
+      .where(eq(contracts.id, contractId));
 
     return NextResponse.json({
       success: true,

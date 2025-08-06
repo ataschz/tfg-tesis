@@ -76,9 +76,10 @@ export function DisputeActions({
         toast.success(`¡Disputa resuelta a favor del ${isContractor ? 'freelancer' : 'empresa'}! Los fondos han sido liberados.`);
         
         // Now call the backend to update database status
+        // Get the userProfile IDs for the winner
         const winnerId = isContractor 
-          ? dispute.contract.contractor.id 
-          : dispute.contract.client.id;
+          ? dispute.contract.contractor?.id 
+          : dispute.contract.client?.id;
         
         const resolution = isContractor ? 'completed' : 'refund';
         const resolutionDetails = isContractor
