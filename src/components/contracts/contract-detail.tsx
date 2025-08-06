@@ -9,7 +9,6 @@ import { ContractParticipants } from "./contract-participants";
 import { ContractDeliverables } from "./contract-deliverables";
 import { ContractTerms } from "./contract-terms";
 import { DisputeDialog } from "@/components/disputes/dispute-dialog";
-import { ReviewDialog } from "@/components/reviews/review-dialog";
 import {
   ArrowLeft,
   AlertTriangle,
@@ -17,6 +16,7 @@ import {
   XCircle,
   Banknote,
   Wallet,
+  Star,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -318,26 +318,18 @@ export function ContractDetail({
             </Button>
           )}
 
-          {/* Review buttons - shown when contract is completed/cancelled and user hasn't reviewed */}
+          {/* Review button - shown when contract is completed and user hasn't reviewed */}
           {canLeaveReviews &&
             !userHasReviewed &&
             reviewableUsers.length > 0 && (
-              <div className="flex items-center gap-2">
-                {reviewableUsers.map((user) => (
-                  <ReviewDialog
-                    key={user.id}
-                    contractId={contract.id}
-                    contractTitle={contract.title}
-                    reviewedUserId={user.id}
-                    reviewedUserName={user.name}
-                    reviewedUserType={user.type}
-                    triggerText={`Calificar ${
-                      user.type === "contractor" ? "freelancer" : "empresa"
-                    }`}
-                    onReviewSuccess={handleReviewSuccess}
-                  />
-                ))}
-              </div>
+              <Button
+                onClick={() => router.push(`/contract/${contract.id}/review`)}
+                variant="outline"
+                className="gap-2 border-yellow-200 text-yellow-700 hover:bg-yellow-50"
+              >
+                <Star className="h-4 w-4" />
+                {userIsContractor ? "Calificar empresa" : "Calificar freelancer"}
+              </Button>
             )}
 
           {/* Dispute button */}

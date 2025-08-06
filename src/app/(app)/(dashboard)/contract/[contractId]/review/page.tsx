@@ -12,12 +12,25 @@ import { toast } from "sonner";
 interface ContractData {
   id: string;
   title: string;
-  contractor: {
+  contractor?: {
     id: string;
     firstName: string;
     lastName: string;
   };
+  client?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  contractorId: string;
+  clientId: string;
   status: string;
+}
+
+interface ReviewableUser {
+  id: string;
+  name: string;
+  type: "contractor" | "client";
 }
 
 export default function ContractReviewPage() {
@@ -28,27 +41,81 @@ export default function ContractReviewPage() {
   const [contract, setContract] = useState<ContractData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [reviewableUser, setReviewableUser] = useState<ReviewableUser | null>(null);
 
-  // Fetch contract data
+  // Fetch contract data and current user
   useEffect(() => {
-    const fetchContract = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`/api/contracts/${contractId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setContract(data.contract);
-          } else {
-            toast.error(data.error || "Error al cargar el contrato");
-            router.push("/dashboard");
-          }
-        } else {
+        // Fetch contract data
+        const contractResponse = await fetch(`/api/contracts/${contractId}`);
+        if (!contractResponse.ok) {
           toast.error("Error al cargar el contrato");
           router.push("/dashboard");
+          return;
         }
+
+        const contractData = await contractResponse.json();
+        if (!contractData.success) {
+          toast.error(contractData.error || "Error al cargar el contrato");
+          router.push("/dashboard");
+          return;
+        }
+
+        const contract = contractData.contract;
+        setContract(contract);
+
+        // Get current user info
+        const userResponse = await fetch('/api/auth/profile');
+        if (!userResponse.ok) {
+          toast.error("Error al obtener información del usuario");
+          router.push("/dashboard");
+          return;
+        }
+
+        const userData = await userResponse.json();
+        const currentUserId = userData.id;
+        setCurrentUserId(currentUserId);
+
+        // Determine who the current user can review
+        let reviewable: ReviewableUser | null = null;
+
+        const userIsClient = 
+          contract.clientId === currentUserId ||
+          contract.contractClients?.some((cc: any) => cc.clientId === currentUserId);
+
+        const userIsContractor = 
+          contract.contractorId === currentUserId ||
+          contract.contractContractors?.some((cc: any) => cc.contractorId === currentUserId);
+
+        if (userIsClient && contract.contractor) {
+          // Client reviewing contractor
+          reviewable = {
+            id: contract.contractor.id,
+            name: `${contract.contractor.firstName} ${contract.contractor.lastName}`,
+            type: "contractor"
+          };
+        } else if (userIsContractor && contract.client) {
+          // Contractor reviewing client
+          reviewable = {
+            id: contract.client.id,
+            name: `${contract.client.firstName} ${contract.client.lastName}`,
+            type: "client"
+          };
+        }
+
+        if (!reviewable) {
+          toast.error("No se pudo determinar quién revisar");
+          router.push("/dashboard");
+          return;
+        }
+
+        setReviewableUser(reviewable);
+
       } catch (error) {
-        console.error("Error fetching contract:", error);
-        toast.error("Error al cargar el contrato");
+        console.error("Error fetching data:", error);
+        toast.error("Error al cargar los datos");
         router.push("/dashboard");
       } finally {
         setLoading(false);
@@ -56,7 +123,7 @@ export default function ContractReviewPage() {
     };
 
     if (contractId) {
-      fetchContract();
+      fetchData();
     }
   }, [contractId, router]);
 
@@ -85,7 +152,7 @@ export default function ContractReviewPage() {
     );
   }
 
-  if (!contract) {
+  if (!contract || !reviewableUser) {
     return (
       <div className="container py-8">
         <div className="text-center space-y-4">
@@ -146,7 +213,7 @@ export default function ContractReviewPage() {
                 <p className="text-muted-foreground">
                   Comparte tu experiencia trabajando con{" "}
                   <strong>
-                    {contract.contractor.firstName} {contract.contractor.lastName}
+                    {reviewableUser.name}
                   </strong>
                 </p>
                 <p className="text-sm text-muted-foreground">
@@ -177,9 +244,9 @@ export default function ContractReviewPage() {
           <ReviewForm
             contractId={contract.id}
             contractTitle={contract.title}
-            reviewedUserId={contract.contractor.id}
-            reviewedUserName={`${contract.contractor.firstName} ${contract.contractor.lastName}`}
-            reviewedUserType="contractor"
+            reviewedUserId={reviewableUser.id}
+            reviewedUserName={reviewableUser.name}
+            reviewedUserType={reviewableUser.type}
             onSuccess={handleReviewSuccess}
             onCancel={() => setShowReviewForm(false)}
           />
