@@ -33,18 +33,8 @@ export async function POST(
 
     // Para demo: sin verificación de permisos
 
-    // Llamar al smart contract para liberar los fondos al seller
-    if (contract.blockchainContractId) {
-      try {
-        await blockchainService.releaseFunds(contract.blockchainContractId);
-      } catch (blockchainError) {
-        console.error('Error releasing funds:', blockchainError);
-        return NextResponse.json(
-          { success: false, error: 'Error al liberar los fondos en blockchain' },
-          { status: 500 }
-        );
-      }
-    }
+    // Los fondos ya fueron liberados por el frontend via MetaMask
+    // Este endpoint solo actualiza el estado en la base de datos
 
     // Actualizar el estado del contrato a 'completed'
     await db

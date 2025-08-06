@@ -71,6 +71,7 @@ export async function POST(request: Request) {
       phone,
       country,
       preferredCurrency,
+      walletAddress,
       contractorData,
       clientData,
     } = body;
@@ -130,6 +131,14 @@ export async function POST(request: Request) {
     // Create the complete profile
     const result = await createCompleteProfile(profileData);
 
+    // Update wallet address in auth user table if provided
+    if (walletAddress) {
+      await db
+        .update(user)
+        .set({ walletAddress })
+        .where(eq(user.id, session.user.id));
+    }
+
     return NextResponse.json(
       {
         message: "Perfil creado exitosamente",
@@ -165,6 +174,7 @@ export async function PUT(request: Request) {
       phone,
       country,
       preferredCurrency,
+      walletAddress,
       contractorData,
       clientData,
     } = body;
@@ -221,6 +231,12 @@ export async function PUT(request: Request) {
 
     // Update the complete profile
     const result = await updateCompleteProfile(session.user.id, profileData);
+
+    // Update wallet address in auth user table
+    await db
+      .update(user)
+      .set({ walletAddress: walletAddress || null })
+      .where(eq(user.id, session.user.id));
 
     return NextResponse.json(
       {

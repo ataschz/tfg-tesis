@@ -40,6 +40,12 @@ const baseSchema = z.object({
   phone: z.string().optional(),
   country: z.string().optional(),
   preferredCurrency: z.string().default("ETH"),
+  walletAddress: z.string()
+    .optional()
+    .refine((address) => {
+      if (!address) return true; // Optional field
+      return /^0x[a-fA-F0-9]{40}$/.test(address);
+    }, "La dirección de wallet debe ser válida (formato: 0x...)")
 });
 
 // Esquema para freelancers
@@ -83,6 +89,8 @@ interface ProfileSetupFormProps {
     id: string;
     email: string;
     name?: string;
+    walletAddress?: string | null;
+    profile?: any; // The existing profile data
   };
   userType: "client" | "contractor" | "mediator";
 }
@@ -108,14 +116,30 @@ export function ProfileSetupForm({ user, userType }: ProfileSetupFormProps) {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(getSchema()),
     defaultValues: {
-      firstName: user.name?.split(" ")[0] || "",
-      lastName: user.name?.split(" ").slice(1).join(" ") || "",
-      phone: "",
-      country: "",
-      preferredCurrency: "ETH",
+      firstName: user.profile?.firstName || user.name?.split(" ")[0] || "",
+      lastName: user.profile?.lastName || user.name?.split(" ").slice(1).join(" ") || "",
+      phone: user.profile?.phone || "",
+      country: user.profile?.country || "",
+      preferredCurrency: user.profile?.preferredCurrency || "ETH",
+      walletAddress: user.walletAddress || "",
       // Campos específicos según tipo de usuario
       ...(userType === "contractor" && {
-        availability: "unavailable" as const,
+        availability: user.profile?.contractorProfile?.availability || "unavailable" as const,
+        username: user.profile?.contractorProfile?.username || "",
+        experienceYears: user.profile?.contractorProfile?.experienceYears || undefined,
+        hourlyRate: user.profile?.contractorProfile?.hourlyRate || undefined,
+        portfolioUrl: user.profile?.contractorProfile?.portfolioUrl || "",
+        specialties: user.profile?.contractorProfile?.specialties?.join(", ") || "",
+        skills: user.profile?.contractorProfile?.skills?.join(", ") || "",
+        timezone: user.profile?.contractorProfile?.timezone || "",
+        bio: user.profile?.contractorProfile?.bio || "",
+      }),
+      ...(userType === "client" && {
+        company: user.profile?.clientProfile?.company || "",
+        industry: user.profile?.clientProfile?.industry || "",
+        website: user.profile?.clientProfile?.website || "",
+        companyDescription: user.profile?.clientProfile?.companyDescription || "",
+        size: user.profile?.clientProfile?.size || "",
       }),
     } as any,
   });
@@ -137,6 +161,7 @@ export function ProfileSetupForm({ user, userType }: ProfileSetupFormProps) {
           phone: values.phone || null,
           country: values.country || null,
           preferredCurrency: values.preferredCurrency,
+          walletAddress: values.walletAddress || null,
 
           // Datos específicos según tipo de usuario
           ...(userType === "contractor" && {
@@ -287,6 +312,26 @@ export function ProfileSetupForm({ user, userType }: ProfileSetupFormProps) {
                       <SelectItem value="COP">COP - Peso Colombiano</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="walletAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Dirección de Wallet (Opcional)</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="0x..." 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Tu dirección de wallet para recibir/enviar pagos en ETH. Puedes configurarla más tarde.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
