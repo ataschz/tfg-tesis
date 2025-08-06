@@ -230,21 +230,42 @@ export function ContractDetail({
         process.env.NEXT_PUBLIC_ESCROW_MANAGER_ADDRESS ||
         "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 
-      // Release the funds
+      // Release the funds on blockchain
       const success = await metaMask.releaseFunds(
         escrowManagerAddress,
         contract.blockchainContractId
       );
 
       if (success) {
-        toast.success(
-          "¡Fondos liberados exitosamente! El contrato ha sido completado."
-        );
-        setTimeout(() => window.location.reload(), 2000);
+        // Update contract status in database
+        toast.loading("Actualizando estado del contrato...");
+        
+        const response = await fetch(`/api/contracts/${contract.id}/release-funds`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          toast.success(
+            "¡Fondos liberados exitosamente! El contrato ha sido completado."
+          );
+          
+          // Redirect to review page
+          setTimeout(() => {
+            router.push(`/contract/${contract.id}/review`);
+          }, 1500);
+        } else {
+          toast.error("Fondos liberados pero error al actualizar estado: " + (result.error || "Error desconocido"));
+        }
       } else {
         toast.error(metaMask.error || "Error al liberar los fondos");
       }
     } catch (error) {
+      console.error("Error releasing funds:", error);
       toast.error("Error inesperado al procesar la liberación de fondos");
     } finally {
       setIsReleasingFunds(false);
