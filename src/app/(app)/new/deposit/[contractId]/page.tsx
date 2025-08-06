@@ -1,15 +1,22 @@
-'use client';
+"use client";
 
-import { initializeBlockchainContract } from '@/lib/actions/contracts';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Copy, ExternalLink, Wallet, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { useMetaMask } from '@/hooks/useMetaMask';
+import { initializeBlockchainContract } from "@/lib/actions/contracts";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Copy,
+  ExternalLink,
+  Wallet,
+  AlertCircle,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useMetaMask } from "@/hooks/useMetaMask";
 
 interface DepositPageProps {
   params: Promise<{ contractId: string }>;
@@ -29,7 +36,7 @@ export default function DepositPage({ params }: DepositPageProps) {
   const [isDepositing, setIsDepositing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [contractId, setContractId] = useState<string | null>(null);
-  
+
   const metaMask = useMetaMask();
 
   // Await params first
@@ -52,17 +59,17 @@ export default function DepositPage({ params }: DepositPageProps) {
 
       if (result.success) {
         setContractData({
-          escrowManagerAddress: result.escrowManagerAddress || '',
-          totalAmount: result.totalAmount || '0',
+          escrowManagerAddress: result.escrowManagerAddress || "",
+          totalAmount: result.totalAmount || "0",
           contractId: result.contractId || contractId,
         });
-        toast.success(result.message || 'Contrato inicializado correctamente');
+        toast.success(result.message || "Contrato inicializado correctamente");
       } else {
-        setError(result.error || 'Error al inicializar el contrato');
-        toast.error(result.error || 'Error al inicializar el contrato');
+        setError(result.error || "Error al inicializar el contrato");
+        toast.error(result.error || "Error al inicializar el contrato");
       }
     } catch (error) {
-      const errorMsg = 'Error inesperado al inicializar el contrato';
+      const errorMsg = "Error inesperado al inicializar el contrato";
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -86,21 +93,25 @@ export default function DepositPage({ params }: DepositPageProps) {
 
     setIsCheckingDeposit(true);
     try {
-      const response = await fetch(`/api/contracts/${contractId}/check-deposit`);
+      const response = await fetch(
+        `/api/contracts/${contractId}/check-deposit`
+      );
       const result = await response.json();
 
       if (result.success) {
         if (result.hasDeposit) {
-          toast.success('¡Depósito detectado! Redirigiendo...');
-          router.push('/dashboard');
+          toast.success("¡Depósito detectado! Redirigiendo...");
+          router.push("/dashboard");
         } else {
-          toast.info('Depósito aún no detectado. Inténtalo de nuevo en unos momentos.');
+          toast.info(
+            "Depósito aún no detectado. Inténtalo de nuevo en unos momentos."
+          );
         }
       } else {
-        toast.error(result.error || 'Error al verificar el depósito');
+        toast.error(result.error || "Error al verificar el depósito");
       }
     } catch (error) {
-      toast.error('Error al verificar el depósito');
+      toast.error("Error al verificar el depósito");
     } finally {
       setIsCheckingDeposit(false);
     }
@@ -115,12 +126,10 @@ export default function DepositPage({ params }: DepositPageProps) {
       if (!metaMask.isConnected) {
         await metaMask.connect();
         if (!metaMask.isConnected) {
-          toast.error('No se pudo conectar a MetaMask');
+          toast.error("No se pudo conectar a MetaMask");
           return;
         }
       }
-
-      toast.loading('Procesando depósito...');
 
       // Make the deposit
       const success = await metaMask.makeDeposit(
@@ -130,17 +139,17 @@ export default function DepositPage({ params }: DepositPageProps) {
       );
 
       if (success) {
-        toast.success('¡Depósito realizado exitosamente!');
-        
+        toast.success("¡Depósito realizado exitosamente!");
+
         // Wait a moment for the blockchain to process, then check
         setTimeout(async () => {
           await checkDeposit();
         }, 2000);
       } else {
-        toast.error(metaMask.error || 'Error al realizar el depósito');
+        toast.error(metaMask.error || "Error al realizar el depósito");
       }
     } catch (error) {
-      toast.error('Error inesperado al procesar el depósito');
+      toast.error("Error inesperado al procesar el depósito");
     } finally {
       setIsDepositing(false);
     }
@@ -158,7 +167,8 @@ export default function DepositPage({ params }: DepositPageProps) {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Estamos preparando tu contrato en la blockchain. Esto puede tomar unos momentos.
+              Estamos preparando tu contrato en la blockchain. Esto puede tomar
+              unos momentos.
             </p>
           </CardContent>
         </Card>
@@ -185,7 +195,10 @@ export default function DepositPage({ params }: DepositPageProps) {
               <Button onClick={initializeContract} variant="outline">
                 Reintentar
               </Button>
-              <Button onClick={() => router.push('/dashboard')} variant="secondary">
+              <Button
+                onClick={() => router.push("/dashboard")}
+                variant="secondary"
+              >
                 Volver al Dashboard
               </Button>
             </div>
@@ -205,7 +218,8 @@ export default function DepositPage({ params }: DepositPageProps) {
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Realizar Depósito</h1>
         <p className="text-lg text-muted-foreground">
-          Para activar tu contrato, debes depositar {contractData.totalAmount} ETH en el contrato de escrow.
+          Para activar tu contrato, debes depositar {contractData.totalAmount}{" "}
+          ETH en el contrato de escrow.
         </p>
       </div>
 
@@ -229,7 +243,16 @@ export default function DepositPage({ params }: DepositPageProps) {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                MetaMask no está instalado. <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" className="underline">Instálalo aquí</a> para usar esta opción.
+                MetaMask no está instalado.{" "}
+                <a
+                  href="https://metamask.io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  Instálalo aquí
+                </a>{" "}
+                para usar esta opción.
               </AlertDescription>
             </Alert>
           ) : (
@@ -238,28 +261,35 @@ export default function DepositPage({ params }: DepositPageProps) {
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription className="text-sm">
                   <strong>Configuración necesaria:</strong>
-                  <br />• Red: Hardhat Local (http://127.0.0.1:8545, Chain ID: 1337)
+                  <br />• Red: Hardhat Local (http://127.0.0.1:8545, Chain ID:
+                  1337)
                   <br />• Wallet: Importar cuenta con private key de Hardhat
                 </AlertDescription>
               </Alert>
-              
+
               {metaMask.error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{metaMask.error}</AlertDescription>
                 </Alert>
               )}
-              
+
               <div className="text-sm text-muted-foreground">
                 {!metaMask.isConnected ? (
-                  <p>Conecta tu MetaMask para realizar el depósito automáticamente.</p>
+                  <p>
+                    Conecta tu MetaMask para realizar el depósito
+                    automáticamente.
+                  </p>
                 ) : (
-                  <p>✅ Conectado: {metaMask.account?.slice(0, 6)}...{metaMask.account?.slice(-4)}</p>
+                  <p>
+                    ✅ Conectado: {metaMask.account?.slice(0, 6)}...
+                    {metaMask.account?.slice(-4)}
+                  </p>
                 )}
               </div>
-              
+
               <div className="flex gap-2">
-                <Button 
+                <Button
                   onClick={handleMetaMaskDeposit}
                   disabled={isDepositing || metaMask.isConnecting}
                   className="flex items-center gap-2"
@@ -272,12 +302,15 @@ export default function DepositPage({ params }: DepositPageProps) {
                   ) : (
                     <Wallet className="h-4 w-4" />
                   )}
-                  {isDepositing ? 'Procesando...' : 
-                   metaMask.isConnecting ? 'Conectando...' :
-                   !metaMask.isConnected ? 'Conectar y Depositar' : 
-                   'Depositar con MetaMask'}
+                  {isDepositing
+                    ? "Procesando..."
+                    : metaMask.isConnecting
+                    ? "Conectando..."
+                    : !metaMask.isConnected
+                    ? "Conectar y Depositar"
+                    : "Depositar con MetaMask"}
                 </Button>
-                
+
                 {metaMask.isConnected && (
                   <Button variant="outline" onClick={metaMask.disconnect}>
                     Desconectar
@@ -301,15 +334,19 @@ export default function DepositPage({ params }: DepositPageProps) {
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Si prefieres no usar MetaMask, puedes transferir manualmente <strong>{contractData.totalAmount} ETH</strong> a la 
-              dirección del contrato usando cualquier wallet. Luego usa "Verificar Depósito" para confirmar.
+              Si prefieres no usar MetaMask, puedes transferir manualmente{" "}
+              <strong>{contractData.totalAmount} ETH</strong> a la dirección del
+              contrato usando cualquier wallet. Luego usa "Verificar Depósito"
+              para confirmar.
             </AlertDescription>
           </Alert>
 
           {/* Información del contrato */}
           <div className="grid gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Dirección del Contrato Escrow</label>
+              <label className="text-sm font-medium">
+                Dirección del Contrato Escrow
+              </label>
               <div className="flex items-center gap-2">
                 <code className="flex-1 p-3 bg-muted rounded-md font-mono text-sm break-all">
                   {contractData.escrowManagerAddress}
@@ -317,7 +354,12 @@ export default function DepositPage({ params }: DepositPageProps) {
                 <Button
                   size="icon"
                   variant="outline"
-                  onClick={() => copyToClipboard(contractData.escrowManagerAddress, 'Dirección del contrato')}
+                  onClick={() =>
+                    copyToClipboard(
+                      contractData.escrowManagerAddress,
+                      "Dirección del contrato"
+                    )
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -333,7 +375,9 @@ export default function DepositPage({ params }: DepositPageProps) {
                 <Button
                   size="icon"
                   variant="outline"
-                  onClick={() => copyToClipboard(contractData.totalAmount, 'Monto')}
+                  onClick={() =>
+                    copyToClipboard(contractData.totalAmount, "Monto")
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -349,7 +393,9 @@ export default function DepositPage({ params }: DepositPageProps) {
                 <Button
                   size="icon"
                   variant="outline"
-                  onClick={() => copyToClipboard(contractData.contractId, 'ID del contrato')}
+                  onClick={() =>
+                    copyToClipboard(contractData.contractId, "ID del contrato")
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -362,9 +408,15 @@ export default function DepositPage({ params }: DepositPageProps) {
             <h3 className="font-semibold">Pasos para realizar el depósito:</h3>
             <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
               <li>Abre tu wallet de Ethereum (MetaMask, Trust Wallet, etc.)</li>
-              <li>Envía exactamente <strong>{contractData.totalAmount} ETH</strong> a la dirección del contrato</li>
+              <li>
+                Envía exactamente{" "}
+                <strong>{contractData.totalAmount} ETH</strong> a la dirección
+                del contrato
+              </li>
               <li>Asegúrate de incluir suficiente gas para la transacción</li>
-              <li>Una vez enviado, haz clic en "Verificar Depósito" para continuar</li>
+              <li>
+                Una vez enviado, haz clic en "Verificar Depósito" para continuar
+              </li>
             </ol>
           </div>
         </CardContent>
@@ -372,8 +424,8 @@ export default function DepositPage({ params }: DepositPageProps) {
 
       {/* Acciones adicionales */}
       <div className="flex gap-4 flex-wrap">
-        <Button 
-          onClick={checkDeposit} 
+        <Button
+          onClick={checkDeposit}
           disabled={isCheckingDeposit}
           variant="outline"
           className="flex items-center gap-2"
@@ -383,16 +435,21 @@ export default function DepositPage({ params }: DepositPageProps) {
           ) : (
             <CheckCircle className="h-4 w-4" />
           )}
-          {isCheckingDeposit ? 'Verificando...' : 'Verificar Depósito Manual'}
+          {isCheckingDeposit ? "Verificando..." : "Verificar Depósito Manual"}
         </Button>
-        
-        <Button variant="outline" onClick={() => router.push('/dashboard')}>
+
+        <Button variant="outline" onClick={() => router.push("/dashboard")}>
           Volver al Dashboard
         </Button>
-        
-        <Button 
-          variant="ghost" 
-          onClick={() => window.open(`https://etherscan.io/address/${contractData.escrowManagerAddress}`, '_blank')}
+
+        <Button
+          variant="ghost"
+          onClick={() =>
+            window.open(
+              `https://etherscan.io/address/${contractData.escrowManagerAddress}`,
+              "_blank"
+            )
+          }
           className="flex items-center gap-2"
         >
           <ExternalLink className="h-4 w-4" />

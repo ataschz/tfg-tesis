@@ -18,6 +18,12 @@ async function main() {
 
   // Get hardhat accounts with their private keys
   const [admin, account1, account2] = await ethers.getSigners();
+
+  // Transfer admin to Account 2 (dedicated admin/mediator account)
+  console.log("🔧 Transferring admin rights to Account 2...");
+  const transferTx = await escrowManager.transferAdmin(account2.address);
+  await transferTx.wait();
+  console.log("✅ Admin rights transferred to:", account2.address);
   
   // Hardhat default private keys (deterministic)
   const accounts = [
@@ -44,7 +50,7 @@ async function main() {
   // Save deployment info
   const deploymentInfo = {
     contractAddress,
-    adminAddress: admin.address,
+    adminAddress: account2.address, // Now Account 2 is the admin
     network: "localhost",
     deployedAt: new Date().toISOString(),
     blockNumber: await ethers.provider.getBlockNumber(),

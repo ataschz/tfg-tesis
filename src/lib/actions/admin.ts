@@ -1,7 +1,13 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { disputes, contracts, disputeEvidence, payments } from "@/lib/db/schema/platform";
+import {
+  disputes,
+  contracts,
+  disputeEvidence,
+  payments,
+  userProfiles,
+} from "@/lib/db/schema/platform";
 import { requireAuth } from "@/lib/auth";
 import { eq, desc } from "drizzle-orm";
 
@@ -11,7 +17,11 @@ export async function getAllDisputes() {
 
     // Only mediators/admins can access all disputes
     if (user.profile.userType !== "mediator") {
-      return { success: false, error: "No tienes permisos para acceder a esta sección", disputes: [] };
+      return {
+        success: false,
+        error: "No tienes permisos para acceder a esta sección",
+        disputes: [],
+      };
     }
 
     const disputesList = await db.query.disputes.findMany({
@@ -23,44 +33,48 @@ export async function getAllDisputes() {
               with: {
                 clientProfile: true,
                 authUser: {
-                  columns: { email: true }
-                }
-              }
+                  columns: { email: true },
+                },
+              },
             },
             contractor: {
               with: {
                 contractorProfile: true,
                 authUser: {
-                  columns: { email: true }
-                }
-              }
-            }
-          }
+                  columns: { email: true },
+                },
+              },
+            },
+          },
         },
         initiator: {
           with: {
             clientProfile: true,
             contractorProfile: true,
             authUser: {
-              columns: { email: true }
-            }
-          }
+              columns: { email: true },
+            },
+          },
         },
         mediator: {
           with: {
             authUser: {
-              columns: { email: true }
-            }
-          }
+              columns: { email: true },
+            },
+          },
         },
-        evidence: true
-      }
+        evidence: true,
+      },
     });
 
     return { success: true, disputes: disputesList };
   } catch (error) {
     console.error("Error fetching all disputes:", error);
-    return { success: false, error: "Error al obtener las disputas", disputes: [] };
+    return {
+      success: false,
+      error: "Error al obtener las disputas",
+      disputes: [],
+    };
   }
 }
 
@@ -70,7 +84,11 @@ export async function getDisputeDetail(disputeId: string) {
 
     // Only mediators/admins can access dispute details
     if (user.profile.userType !== "mediator") {
-      return { success: false, error: "No tienes permisos para acceder a esta disputa", dispute: null };
+      return {
+        success: false,
+        error: "No tienes permisos para acceder a esta disputa",
+        dispute: null,
+      };
     }
 
     const dispute = await db.query.disputes.findFirst({
@@ -83,18 +101,18 @@ export async function getDisputeDetail(disputeId: string) {
                 clientProfile: true,
                 contractorProfile: true,
                 authUser: {
-                  columns: { email: true }
-                }
-              }
+                  columns: { email: true },
+                },
+              },
             },
             contractor: {
               with: {
                 clientProfile: true,
                 contractorProfile: true,
                 authUser: {
-                  columns: { email: true }
-                }
-              }
+                  columns: { email: true },
+                },
+              },
             },
             contractClients: {
               with: {
@@ -102,11 +120,11 @@ export async function getDisputeDetail(disputeId: string) {
                   with: {
                     clientProfile: true,
                     authUser: {
-                      columns: { email: true }
-                    }
-                  }
-                }
-              }
+                      columns: { email: true },
+                    },
+                  },
+                },
+              },
             },
             contractContractors: {
               with: {
@@ -114,42 +132,42 @@ export async function getDisputeDetail(disputeId: string) {
                   with: {
                     contractorProfile: true,
                     authUser: {
-                      columns: { email: true }
-                    }
-                  }
-                }
-              }
-            }
-          }
+                      columns: { email: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         initiator: {
           with: {
             clientProfile: true,
             contractorProfile: true,
             authUser: {
-              columns: { email: true }
-            }
-          }
+              columns: { email: true },
+            },
+          },
         },
         mediator: {
           with: {
             authUser: {
-              columns: { email: true }
-            }
-          }
+              columns: { email: true },
+            },
+          },
         },
         evidence: {
           with: {
             userProfile: {
               with: {
                 authUser: {
-                  columns: { email: true }
-                }
-              }
-            }
-          }
-        }
-      }
+                  columns: { email: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!dispute) {
@@ -159,14 +177,28 @@ export async function getDisputeDetail(disputeId: string) {
     return { success: true, dispute };
   } catch (error) {
     console.error("Error fetching dispute detail:", error);
-    return { success: false, error: "Error al obtener los detalles de la disputa", dispute: null };
+    return {
+      success: false,
+      error: "Error al obtener los detalles de la disputa",
+      dispute: null,
+    };
   }
 }
 
-export async function resolveDispute(disputeId: string, resolution: string, resolutionDetails: string, winnerId?: string) {
+export async function resolveDispute(
+  disputeId: string,
+  resolution: string,
+  resolutionDetails: string,
+  winnerId?: string
+) {
   try {
-    console.log("📝 Resolving dispute:", { disputeId, resolution, resolutionDetails, winnerId });
-    
+    console.log("📝 Resolving dispute:", {
+      disputeId,
+      resolution,
+      resolutionDetails,
+      winnerId,
+    });
+
     const user = await requireAuth();
 
     // Para demo: no verificar permisos de mediador, simplificar
@@ -174,9 +206,53 @@ export async function resolveDispute(disputeId: string, resolution: string, reso
     console.log("🔍 Received winnerId:", winnerId);
 
     await db.transaction(async (tx) => {
+      // First, get the dispute to verify it exists and get contract info
+      console.log("🔍 Getting dispute info...");
+      const dispute = await tx.query.disputes.findFirst({
+        where: eq(disputes.id, disputeId),
+        with: {
+          contract: {
+            with: {
+              contractContractors: {
+                with: { contractor: true },
+              },
+              contractClients: {
+                with: { client: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (!dispute) {
+        throw new Error(`Disputa con ID ${disputeId} no encontrada`);
+      }
+
+      console.log("📋 Found dispute for contract:", dispute.contract?.id);
+      console.log("🔍 Contract contractor ID:", dispute.contract?.contractorId);
+      console.log("🔍 Contract client ID:", dispute.contract?.clientId);
+
+      // Verify winnerId exists if provided
+      if (winnerId) {
+        const winnerProfile = await tx.query.userProfiles.findFirst({
+          where: eq(userProfiles.id, winnerId),
+        });
+        if (!winnerProfile) {
+          throw new Error(
+            `Perfil de usuario ganador con ID ${winnerId} no encontrado`
+          );
+        }
+        console.log(
+          "✅ Winner profile verified:",
+          winnerProfile.firstName,
+          winnerProfile.lastName
+        );
+      }
+
       // Update dispute
       console.log("🔄 Updating dispute status...");
-      await tx.update(disputes)
+      await tx
+        .update(disputes)
         .set({
           status: "resolved",
           resolution,
@@ -184,23 +260,26 @@ export async function resolveDispute(disputeId: string, resolution: string, reso
           winnerId,
           mediatorId: user.profile.id,
           resolvedAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         })
         .where(eq(disputes.id, disputeId));
 
-      // Update contract status based on resolution type
-      const dispute = await tx.query.disputes.findFirst({
-        where: eq(disputes.id, disputeId),
-        with: { contract: true }
-      });
-
       if (dispute?.contract) {
         console.log("📋 Found contract:", dispute.contract.id);
-        
-        let contractStatus: "sent" | "accepted" | "rejected" | "in_progress" | "completed" | "cancelled" | "in_dispute" | "pending_acceptance" | "awaiting_deposit" = "completed";
-        
+
+        let contractStatus:
+          | "sent"
+          | "accepted"
+          | "rejected"
+          | "in_progress"
+          | "completed"
+          | "cancelled"
+          | "in_dispute"
+          | "pending_acceptance"
+          | "awaiting_deposit" = "completed";
+
         // Si el ganador es el contratista, se completa el contrato
-        // Si el ganador es el cliente, se cancela el contrato 
+        // Si el ganador es el cliente, se cancela el contrato
         if (winnerId === dispute.contract.contractorId) {
           contractStatus = "completed";
           console.log("✅ Freelancer wins - contract completed");
@@ -221,13 +300,14 @@ export async function resolveDispute(disputeId: string, resolution: string, reso
           }
           console.log("⚖️ Resolution without specific winner:", contractStatus);
         }
-        
+
         // Actualizar contrato
         console.log("🔄 Updating contract status to:", contractStatus);
-        await tx.update(contracts)
+        await tx
+          .update(contracts)
           .set({
             status: contractStatus,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           })
           .where(eq(contracts.id, dispute.contract.id));
 
@@ -241,7 +321,10 @@ export async function resolveDispute(disputeId: string, resolution: string, reso
     return { success: true, message: "Disputa resuelta exitosamente" };
   } catch (error) {
     console.error("❌ Error resolving dispute:", error);
-    return { success: false, error: `Error al resolver la disputa: ${error.message}` };
+    return {
+      success: false,
+      error: `Error al resolver la disputa: ${error.message}`,
+    };
   }
 }
 
@@ -251,18 +334,25 @@ export async function assignMediatorToDispute(disputeId: string) {
 
     // Only mediators/admins can assign themselves to disputes
     if (user.profile.userType !== "mediator") {
-      return { success: false, error: "No tienes permisos para asignar mediadores" };
+      return {
+        success: false,
+        error: "No tienes permisos para asignar mediadores",
+      };
     }
 
-    await db.update(disputes)
+    await db
+      .update(disputes)
       .set({
         mediatorId: user.profile.id,
         status: "under_review",
-        updatedAt: new Date()
+        updatedAt: new Date(),
       })
       .where(eq(disputes.id, disputeId));
 
-    return { success: true, message: "Te has asignado como mediador de esta disputa" };
+    return {
+      success: true,
+      message: "Te has asignado como mediador de esta disputa",
+    };
   } catch (error) {
     console.error("Error assigning mediator:", error);
     return { success: false, error: "Error al asignar mediador" };
@@ -275,7 +365,11 @@ export async function getDisputeStats() {
 
     // Only mediators/admins can access dispute stats
     if (user.profile.userType !== "mediator") {
-      return { success: false, error: "No tienes permisos para acceder a las estadísticas", stats: null };
+      return {
+        success: false,
+        error: "No tienes permisos para acceder a las estadísticas",
+        stats: null,
+      };
     }
 
     // Get all disputes and calculate stats
@@ -283,15 +377,20 @@ export async function getDisputeStats() {
 
     const stats = {
       total: allDisputes.length,
-      open: allDisputes.filter(d => d.status === "open").length,
-      in_progress: allDisputes.filter(d => d.status === "under_review").length,
-      resolved: allDisputes.filter(d => d.status === "resolved").length,
-      escalated: allDisputes.filter(d => d.status === "closed").length,
+      open: allDisputes.filter((d) => d.status === "open").length,
+      in_progress: allDisputes.filter((d) => d.status === "under_review")
+        .length,
+      resolved: allDisputes.filter((d) => d.status === "resolved").length,
+      escalated: allDisputes.filter((d) => d.status === "closed").length,
     };
 
     return { success: true, stats };
   } catch (error) {
     console.error("Error fetching dispute stats:", error);
-    return { success: false, error: "Error al obtener las estadísticas", stats: null };
+    return {
+      success: false,
+      error: "Error al obtener las estadísticas",
+      stats: null,
+    };
   }
 }

@@ -103,6 +103,11 @@ contract EscrowManager {
         administrator = msg.sender;
     }
 
+    function transferAdmin(address newAdmin) external onlyAdmin {
+        require(newAdmin != address(0), "Nueva direccion de admin invalida");
+        administrator = newAdmin;
+    }
+
     function createEscrow(
         string memory contractId,
         address _buyer,
