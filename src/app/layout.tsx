@@ -3,6 +3,7 @@ import type { Viewport } from "next";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { type ReactNode } from "react";
 import { Toaster } from "sonner";
+import { Libre_Baskerville } from "next/font/google";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
@@ -57,7 +58,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="antialiased">
+      <body className={`antialiased`}>
         <NuqsAdapter>
           <ThemeProvider
             attribute="class"

@@ -5,20 +5,15 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Wallet,
-  LandmarkIcon,
-  ArrowUpRight,
-  TrendingUp,
   Eye,
   EyeOff,
   ShieldCheck,
   FileText,
   AlertTriangle,
   Clock,
-  Plus,
   CreditCard,
 } from "lucide-react";
-import { toast } from "sonner";
-import { WithdrawalDialog } from "./withdrawal-dialog";
+import { EthPriceMetric } from "@/components/ui/eth-price-metric";
 
 interface ClientStats {
   userType: "client";
@@ -49,14 +44,9 @@ interface UnifiedStatsProps {
 
 export function UnifiedStats({ stats }: UnifiedStatsProps) {
   const [showBalance, setShowBalance] = useState(true);
-  const [showWithdrawalDialog, setShowWithdrawalDialog] = useState(false);
-  const [showFundDialog, setShowFundDialog] = useState(false);
 
   const isClient = stats.userType === "client";
   const totalBalance = stats.totalBalance;
-  const withdrawableAmount = isClient
-    ? stats.totalWithdrawableAmount
-    : stats.totalAvailableAmount;
 
   const formatBalance = (amount: number) => {
     if (showBalance) {
@@ -74,8 +64,8 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
         </h1>
         <p className="text-lg text-muted-foreground">
           {isClient
-            ? "Gestiona tus contratos, pagos y fondea tu cuenta desde un solo lugar."
-            : "Gestiona todos tus trabajos, ingresos y retiros desde un solo lugar."}
+            ? "Gestiona tus contratos y pagos. Valores mostrados en USD con respaldo de Ethereum."
+            : "Gestiona todos tus trabajos e ingresos. Valores en USD, pagos procesados en Ethereum."}
         </p>
       </div>
 
@@ -112,42 +102,14 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
                 <h2 className="text-5xl font-bold text-white md:text-6xl">
                   {stats.currency} {formatBalance(totalBalance)}
                 </h2>
-                {/* Removed hardcoded percentage */}
               </div>
             </div>
 
-            {/* Disponible y Botones */}
+            {/* Estadísticas ETH - Derecha */}
             <div className="flex flex-col items-end gap-3">
-              <p className="text-lg text-slate-400">
-                {isClient
-                  ? "Disponible para retirar:"
-                  : "Disponible para retirar:"}{" "}
-                <span className="font-semibold text-white">
-                  {stats.currency} {formatBalance(withdrawableAmount)}
-                </span>
-              </p>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                {isClient && (
-                  <Button
-                    onClick={() => setShowFundDialog(true)}
-                    size="lg"
-                    variant="outline"
-                    className="h-12 gap-2 border-white/20 bg-transparent px-6 text-lg text-white hover:bg-white/10"
-                  >
-                    <Plus className="h-5 w-5" />
-                    Fondear Cuenta
-                  </Button>
-                )}
-                <Button
-                  onClick={() => setShowWithdrawalDialog(true)}
-                  size="lg"
-                  variant="secondary"
-                  className="h-12 gap-2 bg-white px-6 text-lg text-slate-900 hover:bg-slate-100"
-                >
-                  <LandmarkIcon className="h-5 w-5" />
-                  Retirar Fondos
-                  <ArrowUpRight className="h-5 w-5" />
-                </Button>
+              <div className="text-slate-400 text-sm">Precio ETH Actual</div>
+              <div className="bg-white/10 rounded-lg p-4">
+                <EthPriceMetric />
               </div>
             </div>
           </div>
@@ -223,7 +185,7 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
                     {stats.currency}{" "}
                     {formatBalance(
                       isClient
-                        ? totalBalance - withdrawableAmount
+                        ? totalBalance
                         : (stats as ContractorStats).totalInProgressAmount
                     )}
                   </p>
@@ -237,33 +199,6 @@ export function UnifiedStats({ stats }: UnifiedStatsProps) {
         </Card>
       </div>
 
-      <WithdrawalDialog
-        open={showWithdrawalDialog}
-        onOpenChange={setShowWithdrawalDialog}
-        availableAmount={withdrawableAmount}
-        currency={stats.currency}
-      />
-
-      {/* Fund Account Dialog - Only for clients */}
-      {isClient && showFundDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold mb-4">Fondear Cuenta</h3>
-            <p className="text-muted-foreground mb-4">
-              Esta funcionalidad estará disponible próximamente. Podrás agregar
-              fondos a tu cuenta para financiar contratos.
-            </p>
-            <div className="flex gap-2 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setShowFundDialog(false)}
-              >
-                Cerrar
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

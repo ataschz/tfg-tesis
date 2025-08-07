@@ -26,8 +26,7 @@ const formSchema = z.object({
   endDate: z.date({
     required_error: "End date is required",
   }),
-  contractors: z.array(z.string()).min(1, "Select at least one contractor"),
-  companies: z.array(z.string()).min(1, "Select at least one company"),
+  contractors: z.array(z.string()).length(1, "Debe seleccionar exactamente un freelancer"),
   deliverables: z.array(
     z.object({
       title: z.string().min(3, "Title must be at least 3 characters"),
@@ -89,14 +88,11 @@ export function NewContractForm({
   const getDefaultSelections = () => {
     const defaults = {
       contractors: [] as string[],
-      companies: [] as string[],
     };
 
     if (currentUserId && currentUserType) {
       if (currentUserType === "contractor") {
         defaults.contractors = [currentUserId];
-      } else if (currentUserType === "client") {
-        defaults.companies = [currentUserId];
       }
     }
 
@@ -113,7 +109,6 @@ export function NewContractForm({
       amount: "",
       currency: "ETH",
       contractors: defaultSelections.contractors,
-      companies: defaultSelections.companies,
       deliverables: [],
     },
   });
@@ -129,12 +124,7 @@ export function NewContractForm({
 
     // Validate participants
     if (values.contractors.length === 0) {
-      toast.error("Debe seleccionar al menos un contratista");
-      return;
-    }
-
-    if (values.companies.length === 0) {
-      toast.error("Debe seleccionar al menos una empresa");
+      toast.error("Debe seleccionar un freelancer");
       return;
     }
 
@@ -145,16 +135,18 @@ export function NewContractForm({
         values.contractors.includes(c.id)
       ).map(c => `${c.firstName} ${c.lastName}`);
 
-      // Get client names from IDs  
-      const selectedClients = clients.filter(c => 
-        values.companies.includes(c.id)
-      ).map(c => c.clientProfile?.companyName || `${c.firstName} ${c.lastName}`);
+      // Use current user as client
+      const currentClient = clients.find(c => c.id === currentUserId);
+      const selectedClients = currentClient 
+        ? [currentClient.clientProfile?.companyName || `${currentClient.firstName} ${currentClient.lastName}`]
+        : [];
 
       // Simulate AI contract generation
       await new Promise((resolve) => setTimeout(resolve, 2000));
       
       onGenerate({ 
-        ...values, 
+        ...values,
+        companies: currentUserId ? [currentUserId] : [], // Pass current user as company
         deliverables,
         contractorNames: selectedContractors,
         clientNames: selectedClients

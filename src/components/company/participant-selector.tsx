@@ -50,6 +50,7 @@ interface ParticipantSelectorProps {
       industry: string;
     } | null;
   }>;
+  singleSelect?: boolean;
 }
 
 
@@ -59,6 +60,7 @@ export function ParticipantSelector({
   onChange,
   contractors,
   clients,
+  singleSelect = false,
 }: ParticipantSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -90,12 +92,20 @@ export function ParticipantSelector({
 
   const handleSelect = useCallback(
     (itemValue: string) => {
-      const newValue = value.includes(itemValue)
-        ? value.filter((v) => v !== itemValue)
-        : [...value, itemValue];
-      onChange(newValue);
+      if (singleSelect) {
+        // For single select, replace the current selection or clear if same item
+        const newValue = value.includes(itemValue) ? [] : [itemValue];
+        onChange(newValue);
+        setOpen(false); // Close dropdown after selection
+      } else {
+        // For multi select, toggle the item
+        const newValue = value.includes(itemValue)
+          ? value.filter((v) => v !== itemValue)
+          : [...value, itemValue];
+        onChange(newValue);
+      }
     },
-    [value, onChange]
+    [value, onChange, singleSelect]
   );
 
   const handleAddByEmail = useCallback(() => {
@@ -119,11 +129,15 @@ export function ParticipantSelector({
           >
             <span className="truncate">
               {selectedItems.length > 0
-                ? `${selectedItems.length} seleccionado${
-                    selectedItems.length > 1 ? "s" : ""
-                  }`
+                ? singleSelect 
+                  ? selectedItems[0].label
+                  : `${selectedItems.length} seleccionado${
+                      selectedItems.length > 1 ? "s" : ""
+                    }`
                 : `Seleccionar ${
-                    type === "company" ? "empresas" : "contratistas"
+                    singleSelect
+                      ? (type === "contractor" ? "freelancer" : "empresa")
+                      : (type === "company" ? "empresas" : "contratistas")
                   }`}
             </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

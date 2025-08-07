@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
@@ -27,10 +28,18 @@ interface NavigationDropdownProps {
 }
 
 export function NavigationDropdown({ user, userRole }: NavigationDropdownProps) {
+  const pathname = usePathname();
+  
   const handleSignOut = async () => {
     await authClient.signOut();
     redirect("/");
   };
+
+  // Hide the "Crear Contrato" option when we're in the contract creation process
+  const isInContractCreationFlow = 
+    pathname === "/dashboard/contract/new" ||
+    pathname.startsWith("/new/deposit/") ||
+    pathname.startsWith("/accept/");
 
   return (
     <DropdownMenu>
@@ -49,7 +58,7 @@ export function NavigationDropdown({ user, userRole }: NavigationDropdownProps) 
         <DropdownMenuItem asChild>
           <Link href="/dashboard">Dashboard</Link>
         </DropdownMenuItem>
-        {userRole === 'client' && (
+        {userRole === 'client' && !isInContractCreationFlow && (
           <DropdownMenuItem asChild>
             <Link href="/dashboard/contract/new">Crear Contrato</Link>
           </DropdownMenuItem>
